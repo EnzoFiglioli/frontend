@@ -1,0 +1,23 @@
+{
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)", 
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://tabl3ro-server.vercel.app" 
+        },
+        {
+          "key": "Access-Control-Allow-Credentials",
+          "value": "true"
+        }
+      ]
+    }
+  ]
+}
