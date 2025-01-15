@@ -23,7 +23,7 @@ const MensajesTablero = () => {
         .then((res) => {
           setMensajes(res.map(i=>({
             contenido: i.content,
-            avatar: i.fecha.startsWith("/uploads")? `${baseDir}${i.fecha}` : i.fecha,
+            avatar: i.avatar.startsWith("/uploads")? `${baseDir}${i.avatar}` : i.avatar,
             fecha: i.createdAt,
             categoria: i.categoria,
             usuario: i.username,
