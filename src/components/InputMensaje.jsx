@@ -2,21 +2,18 @@ import baseDir from "../path.js";
 import { useState } from "react";
 
 const InputMensaje = () => {
-  const [ theme, setTheme ] = useState("");
   const [ message, setMessage ] = useState(""); 
-  const [ image, setImage ] = useState(false);
   const userData = JSON.parse(localStorage.getItem("user"));
 
-  const handleSubmit = ()=>{
+  const handleSubmit = (e)=>{
+    e.preventDefault()
     fetch(`${baseDir}/api/tweets`,{
       method:"POST",
       headers:{
         "Content-Type":"application/json"
       },
       body:{
-        "theme": theme,
-        "message":message,
-        "image": image
+        "content":message,
       }
     })
   }
@@ -40,7 +37,6 @@ const InputMensaje = () => {
             <select 
               className="dark:bg-black" 
               style={{ width: "auto", marginBottom: "10px" }}
-              onChange={(e)=> setTheme(e.target.value)}
               >
                 <option value="" className="text-white">Seleccionar categoría</option>
                 <option value="IRL">IRL</option>
@@ -66,7 +62,6 @@ const InputMensaje = () => {
                       name="avatar"
                       id="avatar"
                       className="hidden"
-                      onChange={(event)=> setImage(event.target.value)}
                     />
                     <label
                       htmlFor="avatar"

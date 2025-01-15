@@ -10,7 +10,6 @@ const CategoriaContainer = () => {
     fetch(`${baseDir}/api/categorias`)
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
         setCategorias(res);
         setLoading(false);
       })

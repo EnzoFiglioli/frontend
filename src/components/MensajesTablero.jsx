@@ -14,11 +14,22 @@ const MensajesTablero = () => {
 
   useEffect(() => {
     if (session) {
-      fetch(`${baseDir}/api/tweets`,{method:"GET"})
-        .then((res) =>  res.json())
+      fetch(`${baseDir}/api/tweets`, { 
+        method: "GET",
+        credentials: "include",
+      })
+        .then((res) => res.json())
+        .then(res => res.flat())
         .then((res) => {
-          setMensajes(res);
+          setMensajes(res.map(i=>({
+            contenido: i.content,
+            avatar: i.fecha.startsWith("/uploads")? `${baseDir}${i.fecha}` : i.fecha,
+            fecha: i.createdAt,
+            categoria: i.categoria,
+            usuario: i.username,
+          })));
           setLoading(false);
+          console.log({ mensajes });
         })
         .catch((err) => {
           setError(err.message);
@@ -29,8 +40,7 @@ const MensajesTablero = () => {
         .then((data) => {
           setMensajes(data);
           setLoading(false);
-        }
-      )
+        })
         .catch(() => {
           setError("No se pudo cargar los mensajes.");
           setLoading(false);
