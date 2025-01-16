@@ -5,48 +5,41 @@ import { handlerMessage } from "../handler/manejadorMensajes";
 import data from "../data/data.json";
 import { useSession } from "../context/SessionContext.jsx";
 import { baseDir } from "../path.js";
+import {useNewTweet} from "../context/TweetContex.jsx"
 
 const MensajesTablero = () => {
   const [mensajes, setMensajes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { session } = useSession();
+  const {sendTweet} = useNewTweet;
 
   useEffect(() => {
     if (session) {
-      fetch(`${baseDir}/api/tweets`, { 
+      fetch(`${baseDir}/api/tweets`, {
         method: "GET",
         credentials: "include",
       })
         .then((res) => res.json())
-        .then(res => res.flat())
         .then((res) => {
-          setMensajes(res.map(i=>({
-            contenido: i.content,
-            avatar: i.avatar.startsWith("/uploads")? `${baseDir}${i.avatar}` : i.avatar,
-            fecha: i.createdAt,
-            categoria: i.categoria,
-            usuario: i.username,
-          })));
+          setMensajes(
+            res.map((i) => ({
+              contenido: i.content,
+              avatar: i.avatar.startsWith("/uploads") ? `${baseDir}${i.avatar}` : i.avatar,
+              fecha: i.createdAt,
+              categoria: i.categoria,
+              usuario: i.username,
+            }))
+          );
           setLoading(false);
-          console.log({ mensajes });
         })
         .catch((err) => {
           setError(err.message);
           setLoading(false);
         });
-    } else {
-      handlerMessage(data)
-        .then((data) => {
-          setMensajes(data);
-          setLoading(false);
-        })
-        .catch(() => {
-          setError("No se pudo cargar los mensajes.");
-          setLoading(false);
-        });
     }
-  }, [session]);
+  }, [session, sendTweet]);
+  
 
   const formatearFecha = (fechaMensaje) => {
     const fechaActual = new Date();
@@ -83,7 +76,7 @@ const MensajesTablero = () => {
 
   return (
     <div className="mt-4">
-      {session && <InputMensaje />}
+      {session &&<InputMensaje />}
       {mensajes.length > 0 ? (
         mensajes.map((msg, index) => (
           <Tweet

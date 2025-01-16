@@ -4,6 +4,7 @@ import Nav from "./components/Nav";
 import Tendencias from "./components/Tendencias.jsx";
 import Sugerencias from "./components/Sugerencias.jsx";
 import LoginModal from "./components/LoginModal.jsx";
+import {TweetProvider} from "./context/TweetContex.jsx";
 
 const App = () => {
   return (
@@ -15,7 +16,9 @@ const App = () => {
           <CategoriaContainer />
         </div>
         <div className="col-span-1 md:col-span-2 border-gray-300 dark:border-gray-700 p-4">
-            <MensajesTablero />
+            <TweetProvider>
+              <MensajesTablero />
+            </TweetProvider>
         </div>
         <div className="hidden md:flex flex-col md:col-span-1 border-l-2 border-gray-300 dark:border-gray-700 p-4">
           <div className="mb-4">

@@ -1,22 +1,56 @@
-import baseDir from "../path.js";
-import { useState } from "react";
+import {baseDir} from "../path.js";
+import { useState, useEffect } from "react";
+import  {useNewTweet} from "../context/TweetContex.jsx" 
 
 const InputMensaje = () => {
   const [ message, setMessage ] = useState(""); 
-  const userData = JSON.parse(localStorage.getItem("user"));
+  const [ categorias, setCategorias ] = useState([]);
+  const userData = JSON.parse(localStorage.getItem("user")) || {};
+  const {sendTweet, setSendTweet} = useNewTweet
+  const [categoriaTweet, setCategoriaTweet] = useState("");
 
-  const handleSubmit = (e)=>{
-    e.preventDefault()
-    fetch(`${baseDir}/api/tweets`,{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:{
-        "content":message,
+  useEffect(()=>{
+    fetch(`${baseDir}/api/categorias`)
+      .then((res) => res.json())
+      .then((res) => setCategorias(res))
+      .catch(err => console.error(err));
+  },[]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    if (!message.trim()) {
+      console.error("El mensaje está vacío.");
+      return;
+    }
+  
+    try {
+      const response = await fetch(`${baseDir}/api/tweets`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials:"include",
+        body: JSON.stringify({
+          content: message,
+          categoria: categoriaTweet
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
-    })
-  }
+  
+      const result = await response.json();
+      console.log("Tweet enviado con éxito:", result);
+      setMessage("");
+      setSendTweet(!sendTweet)
+    } catch (error) {
+      console.error("Error al enviar el tweet:", error.message);
+    }
+  };
+  
+    console.log({categoriaTweet})
     return (
       <div>
         <form 
@@ -37,12 +71,14 @@ const InputMensaje = () => {
             <select 
               className="dark:bg-black" 
               style={{ width: "auto", marginBottom: "10px" }}
+              onChange={e =>setCategoriaTweet(e.target.value)}
               >
                 <option value="" className="text-white">Seleccionar categoría</option>
-                <option value="IRL">IRL</option>
-                <option value="Política">Política</option>
-                <option value="Economía">Economía</option>
-                <option value="Deportes">Deportes</option>
+              {
+                categorias.map((i, index)=>(
+                <option key={index} value={i.id_categoria}>{i.nombre}</option>
+                ))
+              }
             </select>
           </div>
             <textarea
