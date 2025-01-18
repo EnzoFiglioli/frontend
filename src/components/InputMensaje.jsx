@@ -2,12 +2,15 @@ import {baseDir} from "../path.js";
 import { useState, useEffect } from "react";
 import  {useNewTweet} from "../context/TweetContex.jsx" 
 
-const InputMensaje = () => {
+const InputMensaje = ({agregarNuevoMensaje}) => {
   const [ message, setMessage ] = useState(""); 
   const [ categorias, setCategorias ] = useState([]);
   const userData = JSON.parse(localStorage.getItem("user")) || {};
-  const {sendTweet, setSendTweet} = useNewTweet
+  const { sendTweet, setSendTweet } = useNewTweet();
+
   const [categoriaTweet, setCategoriaTweet] = useState("");
+  const [hashtags, setHashtag] = useState([]);
+
 
   useEffect(()=>{
     fetch(`${baseDir}/api/categorias`)
@@ -16,9 +19,19 @@ const InputMensaje = () => {
       .catch(err => console.error(err));
   },[]);
 
+  useEffect(() => {
+    const regex = /#\w+/g;
+    const result = message.match(regex);
+     if(result) return setHashtag(result);
+     setHashtag([]);
+  }, [message]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+    if (!categoriaTweet) {
+      alert("Tienes que elegir una categoria para el mensaje");
+      return;
+    }
     if (!message.trim()) {
       console.error("El mensaje está vacío.");
       return;
@@ -30,7 +43,7 @@ const InputMensaje = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials:"include",
+        credentials: "include",
         body: JSON.stringify({
           content: message,
           categoria: categoriaTweet
@@ -42,15 +55,33 @@ const InputMensaje = () => {
       }
   
       const result = await response.json();
-      console.log("Tweet enviado con éxito:", result);
-      setMessage("");
-      setSendTweet(!sendTweet)
+      console.log("Respuesta de la API:", result);
+  
+      const tweetIds = result.tweet || [];
+  
+      if (tweetIds.length > 0) {
+        agregarNuevoMensaje({
+          contenido: message,
+          avatar: userData.avatar,
+          fecha: new Date().toISOString(),
+          categoria: categoriaTweet,
+          usuario: userData.username,
+          id: tweetIds[0],
+        });
+  
+        console.log("Tweet enviado con éxito.");
+        setMessage("");
+        setSendTweet((prev) => !prev);
+      } else {
+        console.error("No se recibió un tweet válido en la respuesta.");
+      }
+  
     } catch (error) {
       console.error("Error al enviar el tweet:", error.message);
     }
   };
   
-    console.log({categoriaTweet})
+   
     return (
       <div>
         <form 
@@ -87,6 +118,7 @@ const InputMensaje = () => {
               placeholder="¡¿Qué está pasando?!"
               style={{resize:"none", minHeight:"15vh"}}
               onChange={event => setMessage(event.target.value)}
+              value={message}
             ></textarea>
             
             <div className="min-w-full flex justify-end mt-3 align-center">
@@ -130,8 +162,12 @@ const InputMensaje = () => {
             </div>
           </div>
         </form>
-        <hr className="border-gray-700 mt-3" />
-      </div>
+        <div 
+          className="mt-3 text-white"
+          dangerouslySetInnerHTML={{
+            __html: hashtags.map(i => `<span class="text-blue-500 cursor-pointer" hover:text-blue-200">${i}</span>`).join(' ')
+          }}></div>
+          </div>
     );
   }
   

@@ -1,20 +1,18 @@
 import { useEffect, useState } from "react";
 import Tweet from "./Tweet";
 import InputMensaje from "./InputMensaje.jsx";
-import { handlerMessage } from "../handler/manejadorMensajes";
-import data from "../data/data.json";
 import { useSession } from "../context/SessionContext.jsx";
 import { baseDir } from "../path.js";
-import {useNewTweet} from "../context/TweetContex.jsx"
+import data from "../data/data.json";
 
 const MensajesTablero = () => {
   const [mensajes, setMensajes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { session } = useSession();
-  const {sendTweet} = useNewTweet;
 
   useEffect(() => {
+    // Si hay sesión, obtenemos los tweets desde la API
     if (session) {
       fetch(`${baseDir}/api/tweets`, {
         method: "GET",
@@ -22,13 +20,16 @@ const MensajesTablero = () => {
       })
         .then((res) => res.json())
         .then((res) => {
+          // Ordena los mensajes por fecha
+          const sortedMessages = res.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
           setMensajes(
-            res.map((i) => ({
+            sortedMessages.map((i) => ({
               contenido: i.content,
               avatar: i.avatar.startsWith("/uploads") ? `${baseDir}${i.avatar}` : i.avatar,
               fecha: i.createdAt,
               categoria: i.categoria,
               usuario: i.username,
+              id: i.id_tweet,
             }))
           );
           setLoading(false);
@@ -37,9 +38,16 @@ const MensajesTablero = () => {
           setError(err.message);
           setLoading(false);
         });
+    } else {
+      // Si no hay sesión, usa los datos locales de 'data.json'
+      setMensajes(data);
+      setLoading(false);
     }
-  }, [session, sendTweet]);
-  
+  }, [session]); // Solo vuelve a ejecutar si el valor de 'session' cambia
+
+  const agregarNuevoMensaje = (nuevoMensaje) => {
+    setMensajes((prevMensajes) => [nuevoMensaje, ...prevMensajes]);
+  };
 
   const formatearFecha = (fechaMensaje) => {
     const fechaActual = new Date();
@@ -71,22 +79,32 @@ const MensajesTablero = () => {
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return (
+      <div>
+        <p>{error}</p>
+        <button onClick={() => setLoading(true)}>Intentar de nuevo</button>
+      </div>
+    );
   }
 
   return (
     <div className="mt-4">
-      {session &&<InputMensaje />}
+      {session && <InputMensaje agregarNuevoMensaje={agregarNuevoMensaje} />}
       {mensajes.length > 0 ? (
         mensajes.map((msg, index) => (
-          <Tweet
-            key={msg.id || `msg-${index}`}
-            contenido={msg.contenido}
-            fecha={formatearFecha(msg.fecha)}
-            usuario={msg.usuario}
-            categoria={msg.categoria}
-            avatar={msg.avatar}
-          />
+          msg.contenido ? (
+            <Tweet
+              key={`msg-${index}`}
+              contenido={msg.contenido}
+              fecha={formatearFecha(msg.fecha)}
+              usuario={msg.usuario}
+              categoria={msg.categoria}
+              avatar={msg.avatar}
+              id={msg.id}
+            />
+          ) : (
+            <div key={`msg-${index}`}>Contenido no disponible</div>
+          )
         ))
       ) : (
         <div>No hay mensajes disponibles.</div>

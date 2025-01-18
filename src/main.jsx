@@ -5,21 +5,21 @@ import { ModalProvider } from "./context/ModalContext";
 import { SessionProvider } from "./context/SessionContext";
 import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import { TweetProvider } from "./context/TweetContex.jsx";
 
 createRoot(document.getElementById("root")).render(
   <SessionProvider>
     <BrowserRouter>
       <ModalProvider>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="register" element={<Register />} />
-            <Route path="dashboard" element={
-              <ModalProvider>
-                <Dashboard />
-              </ModalProvider>
-              }/>
-        </Routes>
+        <TweetProvider>
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="register" element={<Register />} />
+            <Route path="dashboard" element={<Dashboard />}/>
+          </Routes>
+          </TweetProvider>
       </ModalProvider>
     </BrowserRouter>
   </SessionProvider>
 );
+                

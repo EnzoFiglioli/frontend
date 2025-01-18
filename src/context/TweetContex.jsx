@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState } from 'react';
 
 const TweetContext = createContext();
 
@@ -12,10 +12,4 @@ export const TweetProvider = ({ children }) => {
   );
 };
 
-export const useNewTweet = () => {
-  const context = useContext(TweetContext);
-  if (!context) {
-    throw new Error("useNewTweet debe usarse dentro de un TweetProvider");
-  }
-  return context;
-};
+export const useNewTweet = () => useContext(TweetContext);
