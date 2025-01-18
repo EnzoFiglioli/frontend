@@ -23,9 +23,9 @@ const Sugerencias = () => {
             <h3 className="dark:text-white font-bold">A quien seguir</h3>
             <div>
                 {session ? (
-                    usuarios.map(user => (
+                    usuarios.map((user,ix) => (
                         <Cuenta
-                            key={user.id_usuario}
+                            key={user.id_usuario || ix}
                             name={user.nombre}
                             avatar={user.avatar.startsWith("/uploads")?`${baseDir}${user.avatar}`: user.avatar }
                             username={user.username}

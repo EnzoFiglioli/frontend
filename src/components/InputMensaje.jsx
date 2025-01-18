@@ -62,7 +62,7 @@ const InputMensaje = ({agregarNuevoMensaje}) => {
       if (tweetIds.length > 0) {
         agregarNuevoMensaje({
           contenido: message,
-          avatar: userData.avatar,
+          avatar: userData.avatar.startsWith(`/`) ? `${baseDir}${userData.avatar}`: userData.avatar,
           fecha: new Date().toISOString(),
           categoria: categoriaTweet,
           usuario: userData.username,
@@ -89,10 +89,13 @@ const InputMensaje = ({agregarNuevoMensaje}) => {
           onSubmit={handleSubmit}>
           <div>
             <img
-              src={userData.avatar}
+              src={userData.avatar.startsWith(`/`) ? 
+                `${baseDir}${userData.avatar}`:
+                userData.avatar
+              }
               width="40"
               height="40"
-              alt={userData.email}
+              alt={`avatar-${userData.username.toLowerCase()}`}
               className="rounded-full"
             />
           </div>
@@ -168,7 +171,7 @@ const InputMensaje = ({agregarNuevoMensaje}) => {
             __html: hashtags.map(i => `<span class="text-blue-500 cursor-pointer" hover:text-blue-200">${i}</span>`).join(' ')
           }}></div>
           </div>
-    );
+    ); 
   }
   
   export default InputMensaje;
