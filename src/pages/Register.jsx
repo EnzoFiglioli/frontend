@@ -62,6 +62,7 @@ export const Register = () => {
   
   return (
     <div className="flex items-center justify-center min-h-screen text-white">
+      <title>Registrate | Tabl3ro</title>
       <Link to="/" className="absolute top-0 left-0 px-3 py-1">
         <i className="fa-solid fa-arrow-right origin-bottom -rotate-180 text-2xl"></i>
       </Link>

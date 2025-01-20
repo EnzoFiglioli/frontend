@@ -7,6 +7,7 @@ const Sugerencias = () => {
     const { session } = useSession();
     const [usuarios, setUsuarios] = useState([]);
     const userActive = JSON.parse(localStorage.getItem("user")) || [];
+    
 
     useEffect(() => {
         fetch(`${baseDir}/api/usuarios`)

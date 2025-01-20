@@ -4,11 +4,11 @@ import Nav from "./components/Nav";
 import Tendencias from "./components/Tendencias.jsx";
 import Sugerencias from "./components/Sugerencias.jsx";
 import LoginModal from "./components/LoginModal.jsx";
-import {TweetProvider} from "./context/TweetContex.jsx";
 
 const App = () => {
   return (
     <div className="flex flex-col min-h-screen">
+      <title>Tabl3ro - Tu sitio de mensajes favorito</title>
       <Nav />
       <hr className="border-gray-600" />
       <div className="flex-grow grid grid-cols-1 md:grid-cols-4 gap-4 p-4">

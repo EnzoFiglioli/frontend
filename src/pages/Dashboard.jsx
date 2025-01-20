@@ -10,6 +10,7 @@ import LoginModal from '../components/LoginModal';
 const Dashboard = () => {
   return (
     <div>
+      <title>Dashboard</title>
       <div className="flex flex-col min-h-screen">
       <Nav />
       <hr className="border-gray-600" />

@@ -1,6 +1,6 @@
 import { useModal } from "../context/ModalContext";
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";  // Importa useNavigate
+import { Link, useNavigate } from "react-router-dom"; 
 import { useSession } from "../context/SessionContext";
 import { baseDir } from "../path.js";
 
@@ -8,7 +8,8 @@ const Nav = () => {
   const { session, setSession } = useSession();
   const { openModal } = useModal();
   const [theme, setTheme] = useState("dark");
-  const navigate = useNavigate();  // Crea una instancia de useNavigate
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme") || "dark";
@@ -39,7 +40,7 @@ const Nav = () => {
   };
 
   return (
-    <nav className="flex justify-between items-center p-4 text-white bg-gray-800">
+    <nav className="flex justify-between items-center p-4 text-white dark:bg-black">
       <h1 className="text-2xl font-bold">Tabl3ro</h1>
       <div className="flex items-center gap-4">
         <button onClick={toggleTheme} aria-label="Cambiar tema">
@@ -47,13 +48,13 @@ const Nav = () => {
         </button>
         {session ? (
           <div className="flex gap-4 items-center">
-            <Link to="dashboard" aria-label="Inicio">
+            <Link to="/dashboard" aria-label="Inicio">
               <i className="fa-solid fa-house"></i>
             </Link>
-            <Link to="notifications" aria-label="Notificaciones">
+            <Link to="/notifications" aria-label="Notificaciones">
               <i className="fa-solid fa-bell"></i>
             </Link>
-            <Link to="profile" aria-label="Perfil">
+            <Link to={`/profile/${user.username}`} aria-label="Perfil">
               Perfil
             </Link>
             <button onClick={handleLogout} className="text-red-500" aria-label="Cerrar sesión">

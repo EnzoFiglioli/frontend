@@ -6,6 +6,9 @@ import { SessionProvider } from "./context/SessionContext";
 import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import { TweetProvider } from "./context/TweetContex.jsx";
+import {Profile} from "./pages/Profile.jsx"
+
+
 
 createRoot(document.getElementById("root")).render(
   <SessionProvider>
@@ -15,7 +18,8 @@ createRoot(document.getElementById("root")).render(
           <Routes>
             <Route path="/" element={<App />} />
             <Route path="register" element={<Register />} />
-            <Route path="dashboard" element={<Dashboard />}/>
+            <Route path="/dashboard" element={<Dashboard />}/>
+            <Route path="/profile/:username" element={<Profile />}/>
           </Routes>
           </TweetProvider>
       </ModalProvider>

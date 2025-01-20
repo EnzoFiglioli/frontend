@@ -9,10 +9,16 @@ const MensajesTablero = () => {
   const [mensajes, setMensajes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState("Para ti");
+
   const { session } = useSession();
+  const { username } = JSON.parse(localStorage.getItem("user")) || {};
+
+  const handleFocus = (tabName) => {
+    setActiveTab(tabName);
+  };
 
   useEffect(() => {
-    // Si hay sesión, obtenemos los tweets desde la API
     if (session) {
       fetch(`${baseDir}/api/tweets`, {
         method: "GET",
@@ -20,7 +26,6 @@ const MensajesTablero = () => {
       })
         .then((res) => res.json())
         .then((res) => {
-          // Ordena los mensajes por fecha
           const sortedMessages = res.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
           setMensajes(
             sortedMessages.map((i) => ({
@@ -39,33 +44,59 @@ const MensajesTablero = () => {
           setLoading(false);
         });
     } else {
-      // Si no hay sesión, usa los datos locales de 'data.json'
       setMensajes(data);
       setLoading(false);
     }
-  }, [session]); // Solo vuelve a ejecutar si el valor de 'session' cambia
+  }, [session]);
+
+
 
   const agregarNuevoMensaje = (nuevoMensaje) => {
     setMensajes((prevMensajes) => [nuevoMensaje, ...prevMensajes]);
   };
 
-  const formatearFecha = (fechaMensaje) => {
-    const fechaActual = new Date();
-    const fechaMsg = new Date(fechaMensaje);
-    const diferencia = fechaActual - fechaMsg;
-    const diasDiferencia = diferencia / (1000 * 3600 * 24);
+  function handlerForYou(e){
+    e.preventDefault();
+    fetch(`${baseDir}/api/tweets`, {
+      method: "GET",
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        // Ordena los mensajes por fecha
+        const sortedMessages = res.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setMensajes(
+          sortedMessages.map((i) => ({
+            contenido: i.content,
+            avatar: i.avatar.startsWith("/uploads") ? `${baseDir}${i.avatar}` : i.avatar,
+            fecha: i.createdAt,
+            categoria: i.categoria,
+            usuario: i.username,
+            id: i.id_tweet,
+          }))
+        );
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }
 
-    if (fechaActual.toDateString() === fechaMsg.toDateString()) {
-      return "Hoy";
+  function handlerForFollowing(e){
+    e.preventDefault();
+    
+    fetch(`${baseDir}/api/tweets/tweets/following/${username}`,{
+      method:"GET",
+      credentials:"include"
+    })
+      .then(res => res.json())
+      .then(res => {
+        setMensajes(res || []);
+        return setLoading(false);
+      })
+      .catch(err => console.error(err))
     }
-
-    if (diasDiferencia < 7) {
-      return fechaMsg.toLocaleDateString();
-    } else {
-      const semanas = Math.floor(diasDiferencia / 7);
-      return `${semanas} semana(s) atrás`;
-    }
-  };
 
   if (loading) {
     return (
@@ -90,13 +121,34 @@ const MensajesTablero = () => {
   return (
     <div className="mt-4">
       {session && <InputMensaje agregarNuevoMensaje={agregarNuevoMensaje} />}
+      {session && 
+      <ul className="flex w-full justify-center items-center gap-8">
+      <li
+        className={`border-b-2 px-4 py-2 font-semibold cursor-pointer transition-all ${
+          activeTab === "Para ti" ? "border-b-blue-500 text-blue-500" : "border-b-transparent text-white"
+        }`}
+        onClick={(e) => {handleFocus("Para ti"), handlerForYou(e)}}
+        tabIndex="0"
+      >
+        Para ti
+      </li>
+      <li
+        className={`px-4 py-2 font-semibold cursor-pointer transition-all ${
+          activeTab === "Seguidos" ? "border-b-2 border-b-blue-500 text-blue-500" : "text-white"
+        }`}
+        onClick={(e) => {handlerForFollowing(e), handleFocus("Seguidos")}}
+        tabIndex="0"
+      >
+        Seguidos
+      </li>
+    </ul> }
       {mensajes.length > 0 ? (
         mensajes.map((msg, index) => (
           msg.contenido ? (
             <Tweet
               key={`msg-${index}`}
               contenido={msg.contenido}
-              fecha={formatearFecha(msg.fecha)}
+              fecha={msg.fecha}
               usuario={msg.usuario}
               categoria={msg.categoria}
               avatar={msg.avatar}
@@ -107,7 +159,9 @@ const MensajesTablero = () => {
           )
         ))
       ) : (
-        <div>No hay mensajes disponibles.</div>
+        <div className="flex justify-center">
+          <p>No hay mensajes disponibles.</p>
+        </div>
       )}
     </div>
   );

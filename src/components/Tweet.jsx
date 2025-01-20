@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useModal } from "../context/ModalContext";
 import { useSession } from "../context/SessionContext.jsx";
 import { baseDir } from "../path.js";
+import {Link} from "react-router-dom";
 
 const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id }) => {
   const [isLiked, setIsLiked] = useState(false);
@@ -49,6 +50,7 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id }) => {
     <div className="dark:text-white h-auto block">
       <div className="flex flex-col bg-white dark:bg-black rounded-lg shadow-lg">
         <div className="flex p-4">
+          <Link to={`/profile/${usuario}`}>
           <picture className="flex justify-center items-center bg-no-repeat bg-center object-content">
             <img
               src={avatar}
@@ -58,20 +60,24 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id }) => {
               className="rounded-full w-22 h-22"
             />
           </picture>
+          </Link>
 
           <div className="flex-col justify-between w-full pl-4">
             <div style={{display:'flex', Width:'100%',gap:'3px', justifyContent:'space-between', paddingRight:'10px'}}>
+            <div style={{width:'100%'}}>
             <h5 className="font-semibold">
-              {usuario} - @{usuario} |{" "}
+              @{usuario} |{" "}
               <span className="text-gray-400">
                 {categoria} · {fecha}{" "}
               </span>
                 {session && (
-                  <span>
+                  <span style={{float:'right'}}>
                     <i className="fa-solid fa-heart"></i> {likes}
                   </span>
                 )}
+                
             </h5>
+            </div>
             </div>
             <p
               className="font-sans text-lg text-gray-800 dark:text-white break-words line-clamp-3"
