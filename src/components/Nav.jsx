@@ -14,12 +14,14 @@ const Nav = () => {
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme") || "dark";
     setTheme(storedTheme);
+    document.documentElement.classList.toggle("dark", storedTheme === "dark");
   }, []);
 
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
   };
 
   const handleLogout = () => {
@@ -41,7 +43,7 @@ const Nav = () => {
 
   return (
     <nav className="flex justify-between items-center p-4 text-white dark:bg-black">
-      <h1 className="text-2xl font-bold">Tabl3ro</h1>
+      <h1 className="text-2xl font-bold dark:text-white text-black">Tabl3ro</h1>
       <div className="flex items-center gap-4">
         <button onClick={toggleTheme} aria-label="Cambiar tema">
           <i className={`fa-solid fa-circle-half-stroke ${theme === "dark" ? "text-yellow-500" : "text-gray-500"}`}></i>
@@ -49,12 +51,12 @@ const Nav = () => {
         {session ? (
           <div className="flex gap-4 items-center">
             <Link to="/dashboard" aria-label="Inicio">
-              <i className="fa-solid fa-house"></i>
+              <i className="fa-solid fa-house text-black dark:text-white"></i>
             </Link>
             <Link to="/notifications" aria-label="Notificaciones">
-              <i className="fa-solid fa-bell"></i>
+              <i className="fa-solid fa-bell text-black dark:text-white"></i>
             </Link>
-            <Link to={`/profile/${user.username}`} aria-label="Perfil">
+            <Link to={`/profile/${user.username}`} className="text-black dark:text-white" aria-label="Perfil">
               Perfil
             </Link>
             <button onClick={handleLogout} className="text-red-500" aria-label="Cerrar sesión">
@@ -63,7 +65,7 @@ const Nav = () => {
           </div>
         ) : (
           <button
-            className="bg-white dark:text-black font-bold py-2 px-4 rounded"
+            className="bg-black dark:bg-white text-white dark:text-black font-bold py-2 px-4 rounded"
             onClick={openModal}
             aria-label="Iniciar sesión"
           >

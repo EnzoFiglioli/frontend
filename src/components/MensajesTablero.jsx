@@ -134,7 +134,7 @@ const MensajesTablero = () => {
       </li>
       <li
         className={`px-4 py-2 font-semibold cursor-pointer transition-all ${
-          activeTab === "Seguidos" ? "border-b-2 border-b-blue-500 text-blue-500" : "text-white"
+          activeTab === "Seguidos" ? "border-b-2 border-b-blue-500 text-blue-500" : "text-black dark:text-white"
         }`}
         onClick={(e) => {handlerForFollowing(e), handleFocus("Seguidos")}}
         tabIndex="0"

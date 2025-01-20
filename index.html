@@ -6,6 +6,23 @@
     <link rel="shortcut icon" href="" type="image/x-icon">
     <link href="./output.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Configuración de Tailwind en el CDN
+    tailwind.config = {
+      darkMode: 'class', // Activar el modo oscuro con la clase 'dark'
+      theme: {
+        extend: {
+          colors: {
+            customBlue: '#1E40AF', // Puedes agregar colores personalizados
+            customGreen: '#10B981',
+          },
+          fontFamily: {
+            customFont: ['Arial', 'sans-serif'], // Puedes agregar fuentes personalizadas
+          },
+        },
+      },
+    }
+  </script>
     <script src="https://kit.fontawesome.com/0c273bd24b.js" crossorigin="anonymous"></script>
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
