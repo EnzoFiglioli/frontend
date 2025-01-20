@@ -103,7 +103,7 @@ const InputMensaje = ({agregarNuevoMensaje}) => {
           <div>
           <div style={{ textAlign: "right" }}>
             <select 
-              className="dark:bg-black" 
+              className="bg-white dark:bg-black" 
               style={{ width: "auto", marginBottom: "10px" }}
               onChange={e =>setCategoriaTweet(e.target.value)}
               >
@@ -117,7 +117,7 @@ const InputMensaje = ({agregarNuevoMensaje}) => {
           </div>
             <textarea
               maxLength={140}
-              className="text-white w-full bg-black cursor-text rounded focus:outline-none"
+              className="dark:text-white w-full dark:bg-black cursor-text rounded focus:outline-none"
               placeholder="¡¿Qué está pasando?!"
               style={{resize:"none", minHeight:"15vh"}}
               onChange={event => setMessage(event.target.value)}

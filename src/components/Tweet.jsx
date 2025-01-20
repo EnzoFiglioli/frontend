@@ -7,7 +7,7 @@ import {Link} from "react-router-dom";
 const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isRePost, setIsRePost] = useState(false);
-  const [likes, setLikes] = useState(0); // Idealmente deberías recibir el número de likes desde el backend
+  const [likes, setLikes] = useState(0);
   const [highlightedContent, setHighlightedContent] = useState("");
   const { openModal } = useModal();
   const { session } = useSession();
@@ -15,7 +15,7 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id }) => {
 
   function toggleLike() {
     setIsLiked(!isLiked);
-    setLikes(prevLikes => isLiked ? prevLikes - 1 : prevLikes + 1); // Actualiza el contador de likes
+    setLikes(prevLikes => isLiked ? prevLikes - 1 : prevLikes + 1);
   }
 
   function toggleRePost() {

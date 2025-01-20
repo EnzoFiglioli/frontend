@@ -92,7 +92,16 @@ const MensajesTablero = () => {
     })
       .then(res => res.json())
       .then(res => {
-        setMensajes(res || []);
+        setMensajes(res.map(i=>({
+          id: i.id_tweet,
+          usuario: i.username,
+          contenido: i.content,
+          avatar: i.avatar.startsWith("/uploads") ? `${baseDir}${i.avatar}` : i.avatar,
+          fecha: i.createdAt,
+          categoria: i.categoria
+        })) || []);
+        console.log(mensajes);
+        
         return setLoading(false);
       })
       .catch(err => console.error(err))
@@ -159,7 +168,7 @@ const MensajesTablero = () => {
           )
         ))
       ) : (
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-3">
           <p>No hay mensajes disponibles.</p>
         </div>
       )}

@@ -10,9 +10,13 @@ const Sugerencias = () => {
     
 
     useEffect(() => {
-        fetch(`${baseDir}/api/usuarios`)
+        fetch(`${baseDir}/api/usuarios`,{
+            method:"GET",
+            credentials:"include"
+        })
             .then(res => res.json())
             .then(res => {
+                console.log(res)
                 const filteredUsuarios = res.filter(user => user.username !== userActive.username);
                 setUsuarios(filteredUsuarios);
             })
