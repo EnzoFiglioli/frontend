@@ -3,12 +3,14 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom"; 
 import { useSession } from "../context/SessionContext";
 import { baseDir } from "../path.js";
+import Cookies from "universal-cookie";
 
 const Nav = () => {
   const { session, setSession } = useSession();
   const { openModal } = useModal();
   const [theme, setTheme] = useState("dark");
   const navigate = useNavigate();
+  const cookies = new Cookies();
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
@@ -34,6 +36,7 @@ const Nav = () => {
     })
       .then(res => res.json())
       .then(res => {
+        cookies.remove("token");
         res?
           navigate("/") :
           console.log(res.error);

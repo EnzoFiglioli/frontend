@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { baseDir } from "../path";
+import { baseDir } from "../path.js";
 
 const CategoriaContainer = () => {
   const [categorias, setCategorias] = useState([]);
@@ -26,7 +26,6 @@ const CategoriaContainer = () => {
   if (error) {
     return <div>Error: {error}</div>;
   }
-  console.log(categorias);
   
   return (
     <nav aria-label="Categorías">

@@ -16,7 +16,6 @@ const Sugerencias = () => {
         })
             .then(res => res.json())
             .then(res => {
-                console.log(res)
                 const filteredUsuarios = res.filter(user => user.username !== userActive.username);
                 setUsuarios(filteredUsuarios);
             })
