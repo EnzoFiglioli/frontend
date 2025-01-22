@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { baseDir } from "../path.js";
-// import {useSession} from "../context/SessionContext.jsx"
+import {useSession} from "../context/SessionContext.jsx"
 
 const Tendencias = () => {
   const [hashtags, setHashtags] = useState([]);
-  const [session] = useState(true);
+  const {session} = useSession();
 
   useEffect(() => {
     fetch(`${baseDir}/api/tweets/hashtags`)

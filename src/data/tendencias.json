@@ -1,0 +1,63 @@
+[
+    {
+      "id": 1,
+      "tema": "InteligenciaArtificial",
+      "categoria": "Tecnología",
+      "popularidad": 98
+    },
+    {
+      "id": 2,
+      "tema": "CambioClimático",
+      "categoria": "MedioAmbiente",
+      "popularidad": 92
+    },
+    {
+      "id": 3,
+      "tema": "Criptomonedas",
+      "categoria": "Economía",
+      "popularidad": 85
+    },
+    {
+      "id": 4,
+      "tema": "ExploraciónEspacial",
+      "categoria": "Ciencia",
+      "popularidad": 88
+    },
+    {
+      "id": 5,
+      "tema": "TrabajoRemoto",
+      "categoria": "Negocios",
+      "popularidad": 91
+    },
+    {
+      "id": 6,
+      "tema": "SaludMental",
+      "categoria": "SaludYBienestar",
+      "popularidad": 89
+    },
+    {
+      "id": 7,
+      "tema": "EnergíaRenovable",
+      "categoria": "MedioAmbiente",
+      "popularidad": 86
+    },
+    {
+      "id": 8,
+      "tema": "Conectividad5G",
+      "categoria": "Tecnología",
+      "popularidad": 84
+    },
+    {
+      "id": 9,
+      "tema": "DerechosHumanos",
+      "categoria": "Sociedad",
+      "popularidad": 90
+    },
+    {
+      "id": 10,
+      "tema": "EDeportes",
+      "categoria": "Entretenimiento",
+      "popularidad": 82
+    }
+  ]
+  

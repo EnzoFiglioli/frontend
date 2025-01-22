@@ -1,0 +1,87 @@
+[
+    {
+        "id_categoria": 1,
+        "nombre": "Política",
+        "descripcion": "Asuntos relacionados con la administración gubernamental, partidos políticos, elecciones, políticas públicas y movimientos sociales."
+    },
+    {
+        "id_categoria": 2,
+        "nombre": "Economía",
+        "descripcion": "Noticias y análisis sobre mercados financieros, comercio, emprendimientos, políticas económicas y desarrollo empresarial."
+    },
+    {
+        "id_categoria": 3,
+        "nombre": "Deportes",	
+        "descripcion": "Todo lo relacionado con competiciones deportivas, resultados, atletas, eventos y noticias de diferentes disciplinas."
+    },
+    {
+        "id_categoria": 4,
+        "nombre": "IRL",
+        "descripcion": "Historias, experiencias y acontecimientos del día a día, fuera del mundo digital y virtual."
+    },
+    {
+        "id_categoria": 5,
+        "nombre": "Entretenimiento",
+        "descripcion": "Novedades sobre cine, música, series, eventos y cultura pop."
+    },
+    {
+        "id_categoria": 6,
+        "nombre": "Tecnología",
+        "descripcion": "Avances tecnológicos, gadgets, software, inteligencia artificial y ciencia aplicada."
+    },
+    {
+        "id_categoria": 7,
+        "nombre": "Salud y Bienestar",
+        "descripcion": "Contenidos sobre fitness, nutrición, salud mental y estilo de vida saludable."
+    },
+    {
+        "id_categoria": 8,
+        "nombre": "Cultura",
+        "descripcion": "Arte, literatura, historia, tradiciones y patrimonio cultural."
+    },
+    {
+        "id_categoria": 9,
+        "nombre": "Educación",
+        "descripcion": "Recursos educativos, cursos, aprendizaje en línea y noticias académicas."
+    },
+    {
+        "id_categoria": 10,
+        "nombre": "Medio Ambiente",
+        "descripcion": "Noticias sobre sostenibilidad, cambio climático, ecología y conservación."
+    },
+    {
+        "id_categoria": 11,
+        "nombre": "Viajes y Turismo",
+        "descripcion": "Destinos, guías de viajes, turismo local e internacional y experiencias turísticas."
+    },
+    {
+        "id_categoria": 12,
+        "nombre": "Ciencia",
+        "descripcion": "Descubrimientos, investigaciones y avances en distintas ramas de la ciencia."
+    },
+    {
+        "id_categoria": 13,
+        "nombre": "Estilo de Vida",
+        "descripcion": "Moda, belleza, decoración, consejos de vida diaria y tendencias personales."
+    },
+    {
+        "id_categoria": 14,
+        "nombre": "Negocios",
+        "descripcion": "Emprendimiento, startups, consejos empresariales y noticias del mundo corporativo."
+    },
+    {
+        "id_categoria": 15,
+        "nombre": "Futuro y Tendencias",
+        "descripcion": "Predicciones y nuevas tendencias sobre tecnología, cultura y sociedad."
+    },
+    {
+        "id_categoria": 16,
+        "nombre": "Sociedad",
+        "descripcion": "Temas sociales como derechos humanos, justicia, inclusión y diversidad."
+    },
+    {
+        "id_categoria": 17,
+        "nombre": "Espacio",
+        "descripcion": "Noticias sobre astronomía, exploración espacial y descubrimientos del universo."
+    }
+]

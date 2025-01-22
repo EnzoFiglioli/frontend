@@ -10,16 +10,18 @@ const Sugerencias = () => {
     
 
     useEffect(() => {
+        if(session){
         fetch(`${baseDir}/api/usuarios`,{
             method:"GET",
             credentials:"include"
         })
-            .then(res => res.json())
-            .then(res => {
-                const filteredUsuarios = res.filter(user => user.username !== userActive.username);
-                setUsuarios(filteredUsuarios);
-            })
-            .catch(err => console.error(err));
+        .then(res => res.json())
+        .then(res => {
+            const filteredUsuarios = res.filter(user => user.username !== userActive.username);
+            setUsuarios(filteredUsuarios);
+        })
+        .catch(err => console.error(err));
+    }
     }, []);
 
     return (

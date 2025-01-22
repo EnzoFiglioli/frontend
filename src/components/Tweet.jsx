@@ -4,7 +4,7 @@ import { useSession } from "../context/SessionContext.jsx";
 import { baseDir } from "../path.js";
 import {Link} from "react-router-dom";
 
-const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id }) => {
+const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isRePost, setIsRePost] = useState(false);
   const [likes, setLikes] = useState(0);
@@ -13,9 +13,34 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id }) => {
   const { session } = useSession();
   const userActive = JSON.parse(localStorage.getItem("user")) || null;
 
+  console.log(liked);
+
   function toggleLike() {
     setIsLiked(!isLiked);
     setLikes(prevLikes => isLiked ? prevLikes - 1 : prevLikes + 1);
+  }
+  function handlerLike(e){
+    console.log(id);
+    e.preventDefault();
+    fetch(`${baseDir}/api/like/create`,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      credentials:"include",
+      body:JSON.stringify({
+        id_tweet:id,
+      })
+    })
+      .then((res)=> res.json())
+      .then((res)=> {
+        if(res.ok){
+          res.msg.startsWith("Like eliminado")
+          setIsLiked(!isLiked);
+          setLikes((prevLikes => isLiked ?  prevLikes + 1 : prevLikes - 1 ));
+        }
+      })
+      .catch(err => console.log(err));
   }
 
   function toggleRePost() {
@@ -72,7 +97,12 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id }) => {
               </span>
                 {session && (
                   <span style={{float:'right'}}>
-                    <i className="fa-solid fa-heart"></i> {likes}
+                    <i 
+                      className={`fa-solid fa-heart cursor-pointer ${liked ? "text-red-500" : "text-green-400"}`}
+                      onClick={(e)=> handlerLike(e)}
+                    >
+                    </i>
+                    {likes}
                   </span>
                 )}
                 
