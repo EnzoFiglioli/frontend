@@ -3,12 +3,13 @@ import Tweet from "./Tweet";
 import InputMensaje from "./InputMensaje.jsx";
 import { useSession } from "../context/SessionContext.jsx";
 import { baseDir } from "../path.js";
-import data from "../data/data.json"; // Importando el archivo JSON desde src/data
+import data from "../data/data.json";
 import { handlerDate } from "../handler/handlerDate.js";
 
 const MensajesTablero = () => {
   const [mensajes, setMensajes] = useState([]);
   const [likesContainer, setLikesContainer] = useState([]);
+  const [likesCount, setLikesCount] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState(sessionStorage.getItem("section") || "Para ti");
@@ -16,20 +17,19 @@ const MensajesTablero = () => {
   const { session } = useSession();
   const { username } = JSON.parse(localStorage.getItem("user")) || {};
 
-  // Fetch de los likes cuando hay sesión
   useEffect(() => {
     if (session) {
       fetch(`${baseDir}/api/like/info`, { method: "GET", credentials: "include" })
         .then(res => res.json())
         .then(res => {
-          setLikesContainer(res)
-          console.log(likesContainer)
+          console.log(res);
+          setLikesCount(res.likesCount);
+          setLikesContainer(res.likesUser);
         })
         .catch(err => console.error(err));
     }
   }, [session]);
 
-  // Fetch de los tweets cuando se cambia de tab
   useEffect(() => {
     if (activeTab === "Para ti") {
       handlerForYou();
@@ -47,7 +47,6 @@ const MensajesTablero = () => {
     setMensajes((prevMensajes) => [nuevoMensaje, ...prevMensajes]);
   };
 
-  // Función para obtener los tweets
   function handlerForYou() {
     if (session) {
       fetch(`${baseDir}/api/tweets`, {
@@ -58,13 +57,8 @@ const MensajesTablero = () => {
         .then((res) => {
           const sortedMessages = res.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-          // Asociamos el estado de "likes" a cada tweet
           setMensajes(
             sortedMessages.map((i) => {
-              const isLiked = likesContainer.some(
-                (user) => user.id_user === username && user.id_tweet === i.id_tweet
-              );
-
               return {
                 contenido: i.content,
                 avatar: i.avatar.startsWith("/uploads") ? `${baseDir}${i.avatar}` : i.avatar,
@@ -72,7 +66,6 @@ const MensajesTablero = () => {
                 categoria: i.categoria,
                 usuario: i.username,
                 id: i.id_tweet,
-                liked: isLiked, // Indicamos si el tweet está "liked"
               };
             })
           );
@@ -83,14 +76,16 @@ const MensajesTablero = () => {
           setLoading(false);
         });
     } else {
-      // Cargamos los datos desde el archivo JSON importado
       setMensajes(data);
       setLoading(false);
     }
   }
 
-  // Función para obtener los tweets de los usuarios seguidos
   function handlerForFollowing() {
+    if(!session){
+      setLoading(false);
+      return setMensajes(data);
+    }
     fetch(`${baseDir}/api/tweets/tweets/following/${username}`, {
       method: "GET",
       credentials: "include",
@@ -158,8 +153,10 @@ const MensajesTablero = () => {
         </ul>
       )}
       {mensajes.length > 0 ? (
-        mensajes.map((msg, index) => (
-          msg.contenido ? (
+        mensajes.map((msg, index) => {
+          const isLiked = likesContainer.some(like => like.id_tweet == msg.id);
+          const cantidad = likesCount.find(i => i.id_tweet == msg.id)?.cantidad || 0;
+          return msg.contenido ? (
             <Tweet
               key={`msg-${index}`}
               contenido={msg.contenido}
@@ -168,13 +165,13 @@ const MensajesTablero = () => {
               categoria={msg.categoria}
               avatar={msg.avatar}
               id={msg.id}
-              liked={msg.liked} // Pasamos el estado de like al componente Tweet
+              liked={isLiked}
+              count={cantidad}
             />
           ) : (
             <div key={`msg-${index}`}>Contenido no disponible</div>
-          )
-        ))
-      ) : (
+          )}
+        )) : (
         <div className="flex justify-center mt-3">
           <p>No hay mensajes disponibles.</p>
         </div>

@@ -1,18 +1,24 @@
 import { useEffect, useState } from "react";
 import { baseDir } from "../path.js";
-import {useSession} from "../context/SessionContext.jsx"
+import {useSession} from "../context/SessionContext.jsx";
+import  {useTendencias} from "../context/TendenciasContext.jsx"
 
 const Tendencias = () => {
   const [hashtags, setHashtags] = useState([]);
   const {session} = useSession();
+  const {tendencias, setTendencias} = useTendencias();
 
   useEffect(() => {
-    fetch(`${baseDir}/api/tweets/hashtags`)
-      .then(response => response.json())
-      .then(response => {
-        setHashtags(response.flat() || []);
-      })
-      .catch(err => console.log(err));
+    if(tendencias.length > 0){
+      setTendencias(tendencias);
+    }else{
+      fetch(`${baseDir}/api/tweets/hashtags`)
+        .then(response => response.json())
+        .then(response => {
+          setHashtags(response.flat() || []);
+        })
+        .catch(err => console.log(err));
+    }
   }, []);
 
   return (

@@ -1,23 +1,26 @@
 import {baseDir} from "../path.js";
 import { useState, useEffect } from "react";
-import  {useNewTweet} from "../context/TweetContex.jsx" 
+import  {useNewTweet} from "../context/TweetContex.jsx";
+import categoriasData from "../data/categoria.json";  
 
 const InputMensaje = ({agregarNuevoMensaje}) => {
   const [ message, setMessage ] = useState(""); 
-  const [ categorias, setCategorias ] = useState([]);
   const userData = JSON.parse(localStorage.getItem("user")) || {};
   const { sendTweet, setSendTweet } = useNewTweet();
+  const [categorias, setCategorias] = useState([]);
 
   const [categoriaTweet, setCategoriaTweet] = useState("");
   const [hashtags, setHashtag] = useState([]);
 
 
-  useEffect(()=>{
-    fetch(`${baseDir}/api/categorias`)
-      .then((res) => res.json())
-      .then((res) => setCategorias(res))
-      .catch(err => console.error(err));
-  },[]);
+  useEffect(() => {
+    try {
+      setCategorias(categoriasData);
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
+
 
   useEffect(() => {
     const regex = /#\w+/g;

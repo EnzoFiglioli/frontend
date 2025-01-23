@@ -5,10 +5,11 @@ import CategoriaContainer from '../components/CategoriaContainer';
 import { SessionProvider } from '../context/SessionContext';
 import Tendencias from '../components/Tendencias';
 import LoginModal from '../components/LoginModal';
+import {TendenciasProvider} from "../context/TendenciasContext.jsx";
 
 const Dashboard = () => {
   return (
-    <SessionProvider> {/* Usamos SessionProvider aquí para envolver todo el dashboard */}
+    <SessionProvider> 
       <div>
         <title>Dashboard</title>
         <div className="flex flex-col min-h-screen">
@@ -27,7 +28,9 @@ const Dashboard = () => {
 
             <div className="hidden md:flex flex-col md:col-span-1 border-l-2 border-gray-300 dark:border-gray-700 p-4">
               <div className="mb-4">
-                <Tendencias />
+                <TendenciasProvider>
+                  <Tendencias />
+                </TendenciasProvider>
               </div>
               <div className="rounded border-gray-300 dark:border-gray-700 p-4">
                 <Sugerencias />

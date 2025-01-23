@@ -4,6 +4,7 @@ import Nav from "./components/Nav";
 import Tendencias from "./components/Tendencias.jsx";
 import Sugerencias from "./components/Sugerencias.jsx";
 import LoginModal from "./components/LoginModal.jsx";
+import { TendenciasProvider } from "./context/TendenciasContext.jsx";
 
 const App = () => {
   return (
@@ -20,7 +21,9 @@ const App = () => {
         </div>
         <div className="hidden md:flex flex-col md:col-span-1 border-l-2 border-gray-300 dark:border-gray-700 p-4">
           <div className="mb-4">
+          <TendenciasProvider>
             <Tendencias />
+          </TendenciasProvider>
           </div>
           <div className="rounded border-gray-300 dark:border-gray-700 p-4">
             <Sugerencias />

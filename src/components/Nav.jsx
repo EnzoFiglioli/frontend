@@ -51,7 +51,7 @@ const Nav = () => {
         <button onClick={toggleTheme} aria-label="Cambiar tema">
           <i className={`fa-solid fa-circle-half-stroke ${theme === "dark" ? "text-yellow-500" : "text-gray-500"}`}></i>
         </button>
-        {session ? (
+        {session && user ? (
           <div className="flex gap-4 items-center">
             <Link to="/dashboard" aria-label="Inicio">
               <i className="fa-solid fa-house text-black dark:text-white"></i>

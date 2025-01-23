@@ -4,23 +4,15 @@ import { useSession } from "../context/SessionContext.jsx";
 import { baseDir } from "../path.js";
 import {Link} from "react-router-dom";
 
-const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked }) => {
-  const [isLiked, setIsLiked] = useState(false);
+const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count }) => {
+  const [isLiked, setIsLiked] = useState(liked);
   const [isRePost, setIsRePost] = useState(false);
-  const [likes, setLikes] = useState(0);
   const [highlightedContent, setHighlightedContent] = useState("");
   const { openModal } = useModal();
   const { session } = useSession();
   const userActive = JSON.parse(localStorage.getItem("user")) || null;
 
-  console.log(liked);
-
-  function toggleLike() {
-    setIsLiked(!isLiked);
-    setLikes(prevLikes => isLiked ? prevLikes - 1 : prevLikes + 1);
-  }
   function handlerLike(e){
-    console.log(id);
     e.preventDefault();
     fetch(`${baseDir}/api/like/create`,{
       method:"POST",
@@ -34,11 +26,8 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked }) => {
     })
       .then((res)=> res.json())
       .then((res)=> {
-        if(res.ok){
-          res.msg.startsWith("Like eliminado")
-          setIsLiked(!isLiked);
-          setLikes((prevLikes => isLiked ?  prevLikes + 1 : prevLikes - 1 ));
-        }
+        console.log(res);
+        setIsLiked(isLiked == true ? false : true);
       })
       .catch(err => console.log(err));
   }
@@ -96,13 +85,8 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked }) => {
                 {categoria} · {fecha}{" "}
               </span>
                 {session && (
-                  <span style={{float:'right'}}>
-                    <i 
-                      className={`fa-solid fa-heart cursor-pointer ${liked ? "text-red-500" : "text-green-400"}`}
-                      onClick={(e)=> handlerLike(e)}
-                    >
-                    </i>
-                    {likes}
+                  <span style={{float:'right'}} className={`${isLiked ? "text-red-500" : "text-white"}`}>{count}<i className={`fa-solid fa-heart cursor-pointer pl-2 ${isLiked ? "text-red-500" : "text-white"}`}
+                      onClick={(e)=> handlerLike(e)}></i>
                   </span>
                 )}
                 
@@ -116,26 +100,6 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked }) => {
           </div>
         </div>
         <div className="flex justify-between items-center px-10 py-2 ml-20 text-gray-500">
-          {likes > 0 && (
-            <div>
-              <a href="#" className="hover:text-blue-500 flex items-center text-sm">
-                <i className="fa-regular fa-comment"></i> 2k
-              </a>
-              <span
-                className={`p-1 ${isRePost ? "text-green-500" : "text-gray-500"} hover:text-green-700 flex items-center text-sm`}
-                onClick={toggleRePost}
-              >
-                <i className="fa-solid fa-repeat"></i> 20k
-              </span>
-
-              <span
-                className={`p-1 ${isLiked ? "text-red-500" : ""} flex items-center text-sm`}
-                onClick={toggleLike}
-              >
-                <i className={`${isLiked ? "fa-solid fa-heart" : "fa-regular fa-heart"}`}></i> 144k
-              </span>
-            </div>
-          )}
           {usuario === userActive?.username && (
             <div className="flex gap-3 justify-end items-center w-full">
               <p className="text-gray-500">
