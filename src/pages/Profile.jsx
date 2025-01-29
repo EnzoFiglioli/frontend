@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Tweet from "../components/Tweet.jsx";
 import { useParams } from "react-router-dom";
 import { useSession } from "../context/SessionContext.jsx";
-import {handlerDate} from "../handler/handlerDate.js"
+import { handlerDate } from "../handler/handlerDate.js";
 import Modal from "react-modal";
 
 Modal.setAppElement('#root'); // Asegúrate de establecer el elemento raíz
@@ -29,6 +29,7 @@ export const Profile = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+    // Obtener datos del perfil
     useEffect(() => {
         fetch(`${baseDir}/api/usuarios/${username}`, {
             method: "GET",
@@ -42,15 +43,21 @@ export const Profile = () => {
         .catch((err) => console.error(err));
     }, [username]);
 
+    // Obtener los tweets del perfil
     useEffect(() => {
         fetch(`${baseDir}/api/tweets/profile/${username}`, {
             method: "GET"
         })
         .then((res) => res.json())
-        .then((res) => setTweets(res))
+        .then((res) => {
+            console.log(res); // Verifica la respuesta aquí
+            setTweets(res);
+        })
         .catch((err) => console.error(err));
+        
     }, [username]);
 
+    // Obtener seguidores y seguidos
     useEffect(() => {
         fetch(`${baseDir}/api/usuarios/follow/info/${username}`, {
             method: "GET",
@@ -65,6 +72,7 @@ export const Profile = () => {
         .catch(err => console.log(err));
     }, [username]);
 
+    // Manejo del seguimiento
     const handlerFollow = (e) => {
         e.preventDefault();
         fetch(`${baseDir}/api/usuarios/follow`, {
@@ -90,21 +98,64 @@ export const Profile = () => {
         .catch((error) => console.error(error));
     };
 
-    // Eliminar cuenta
+    // Manejo de la eliminación de cuenta
     const handleDeleteAccount = () => {
-        // Aquí puedes hacer la llamada a la API para eliminar la cuenta
-        console.log("Cuenta eliminada");
-        setIsDeleteModalOpen(false); // Cerrar modal después de eliminar
+        fetch(`${baseDir}/api/usuarios/`, {
+            method: "DELETE",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ username: usuario.username })
+        })
+        .then((res) => res.json())
+        .then((res) => {
+            if (res.success) {
+                console.log("Cuenta eliminada exitosamente");
+                // Puedes redirigir al usuario si es necesario:
+                // window.location.href = '/login';
+            } else {
+                console.error("Error al eliminar la cuenta:", res.message);
+            }
+        })
+        .catch((error) => {
+            console.error("Error en la solicitud:", error);
+        });
+
+        setIsDeleteModalOpen(false);  // Cerrar el modal después de intentar eliminar la cuenta
     };
 
-    // Editar perfil
+    // Manejo de la edición de perfil
     const handleEditProfile = () => {
-        // Aquí puedes manejar la edición del perfil
-        console.log("Perfil editado");
-        setIsEditModalOpen(false); // Cerrar modal después de editar
+        fetch(`${baseDir}/api/usuarios/`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username: usuario.username,
+                name: usuario.name,
+                lastname: usuario.lastname,
+                email: usuario.email
+            })
+        })
+        .then((res) => res.json())
+        .then((res) => {
+            if (res.success) {
+                console.log("Perfil actualizado correctamente");
+                // Puedes actualizar el estado del usuario en el contexto si es necesario:
+                // setUserData({ ...userData, ...res.updatedUser });
+            } else {
+                console.error("Error al actualizar el perfil:", res.message);
+            }
+        })
+        .catch((err) => console.error("Error en la solicitud:", err));
+
+        setIsEditModalOpen(false);  // Cerrar el modal después de guardar
     };
 
-    // Pantalla de carga
+    // Mostrar cargando mientras se obtienen los datos
     if (loading) {
         return (
             <div className="w-full h-full m-auto flex flex-col justify-center">
@@ -184,7 +235,6 @@ export const Profile = () => {
                 </div>
             </div>
 
-            {/* Modal Eliminar Cuenta */}
             <Modal
                 isOpen={isDeleteModalOpen}
                 onRequestClose={() => setIsDeleteModalOpen(false)}
@@ -210,26 +260,42 @@ export const Profile = () => {
                 </div>
             </Modal>
 
-            {/* Modal Editar Perfil */}
             <Modal
                 isOpen={isEditModalOpen}
                 onRequestClose={() => setIsEditModalOpen(false)}
                 contentLabel="Editar perfil"
-                
                 className="modal dark:bg-gray-900"
                 overlayClassName="overlay"
             >
                 <h2 className="text-2xl dark:text-white text-black">Editar tu perfil</h2>
-                {/* Aquí podrías agregar un formulario para editar el perfil */}
                 <form className="text-black">
                     <label htmlFor="name" className="dark:text-white text-black block mt-4">Nombre:</label>
-                    <input type="text" name="name" id="name" className="w-full p-2 border-2 border-gray-300 rounded-md" value={usuario.name} />
+                    <input
+                        type="text"
+                        name="name"
+                        id="name"
+                        className="w-full p-2 border-2 border-gray-300 rounded-md"
+                        value={usuario.name}
+                        onChange={(e) => setUsuario({...usuario, name: e.target.value})}
+                    />
                     <label htmlFor="lastname" className="dark:text-white text-black block mt-4">Apellido:</label>
-                    <input type="text" name="lastname" id="lastname" className="w-full p-2 border-2 border-gray-300 rounded-md" value={usuario.lastname} />
+                    <input
+                        type="text"
+                        name="lastname"
+                        id="lastname"
+                        className="w-full p-2 border-2 border-gray-300 rounded-md"
+                        value={usuario.lastname}
+                        onChange={(e) => setUsuario({...usuario, lastname: e.target.value})}
+                    />
                     <label htmlFor="email" className="dark:text-white text-black block mt-4">Correo electrónico:</label>
-                    <input type="email" name="email" id="email" className="w-full p-2 border-2 border-gray-300 rounded-md" value={usuario.email} />
-                    <label htmlFor="avatar" className="dark:text-white text-black block mt-4">Avatar:</label>
-                    <input type="text" name="avatar" id="avatar" className="w-full p-2 border-2 border-gray-300 rounded-md" value={usuario.avatar} />
+                    <input
+                        type="email"
+                        name="email"
+                        id="email"
+                        className="w-full p-2 border-2 border-gray-300 rounded-md"
+                        value={usuario.email}
+                        onChange={(e) => setUsuario({...usuario, email: e.target.value})}
+                    />
                 </form>
                 <div className="flex justify-between mt-4">
                     <button

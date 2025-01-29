@@ -7,14 +7,25 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count 
   const [isLiked, setIsLiked] = useState(() => {
     // Intenta obtener el estado del like desde sessionStorage
     const storedLike = sessionStorage.getItem(`liked-${id}`);
-    return storedLike ? JSON.parse(storedLike) : liked; // Si no hay en sessionStorage, usa el valor pasado como prop
+    try {
+      return storedLike ? JSON.parse(storedLike) : liked;
+    } catch (e) {
+      console.error('Error al parsear isLiked desde sessionStorage:', e);
+      return liked; // Valor por defecto en caso de error
+    }
   });
-
+  
   const [likeCount, setLikeCount] = useState(() => {
     // Intenta obtener la cantidad de likes desde sessionStorage
     const storedLikeCount = sessionStorage.getItem(`likeCount-${id}`);
-    return storedLikeCount ? JSON.parse(storedLikeCount) : count; // Si no hay en sessionStorage, usa el valor pasado como prop
+    try {
+      return storedLikeCount ? JSON.parse(storedLikeCount) : count; // Si no hay en sessionStorage, usa el valor pasado como prop
+    } catch (e) {
+      console.error('Error al parsear likeCount desde sessionStorage:', e);
+      return count; // Valor por defecto en caso de error
+    }
   });
+  
 
   const [highlightedContent, setHighlightedContent] = useState(contenido);
 
@@ -37,7 +48,7 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count 
 
   const handlerLike = (e) => {
     e.preventDefault();
-
+  
     fetch(`${baseDir}/api/like/create`, {
       method: "POST",
       headers: {
@@ -46,13 +57,20 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count 
       credentials: "include",
       body: JSON.stringify({ id_tweet: id }),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        // Verifica que la respuesta es un JSON válido
+        if (!res.ok) {
+          throw new Error("Error en la respuesta del servidor");
+        }
+        return res.json(); // Solo parsea si la respuesta es OK
+      })
       .then((res) => {
         setIsLiked((prevState) => !prevState);
         setLikeCount((prevState) => (isLiked ? prevState - 1 : prevState + 1));
       })
       .catch((err) => console.error("Like failed:", err));
   };
+  
 
   const handleDeleteClick = () => {
     confirm({
@@ -67,13 +85,20 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count 
       method: "DELETE",
       credentials: "include"
     });
-
-    if (response.ok) {
+  
+    if (!response.ok) {
+      console.error("Error al eliminar el tweet");
+      return;
+    }
+  
+    const data = await response.json(); // Asegúrate de que la respuesta sea un JSON
+    if (data.success) {
       window.location.href = "/dashboard";
     } else {
       alert("Error al eliminar mensaje del tablero");
     }
   };
+  
 
   return (
     <div className="dark:text-white h-auto block">

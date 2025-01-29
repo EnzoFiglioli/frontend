@@ -175,9 +175,9 @@ const MensajesTablero = () => {
         categoria={msg.categoria}
         avatar={msg.avatar}
         id={msg.id}
-        liked={isLiked} // Propaga el estado de "liked"
-        count={cantidad} // Propaga la cantidad de likes
-      />
+        liked={isLiked}
+        count={cantidad}
+        />
     ) : (
       <div key={`msg-${index}`}>Contenido no disponible</div>
     );
