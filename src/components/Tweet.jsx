@@ -1,57 +1,27 @@
-import { useEffect, useState } from "react";
-import { useModal } from "../context/ModalContext";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useSession } from "../context/SessionContext.jsx";
 import { baseDir } from "../path.js";
-import {Link} from "react-router-dom";
 
 const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count }) => {
-  const [isLiked, setIsLiked] = useState(liked);
-  const [isRePost, setIsRePost] = useState(false);
-  const [highlightedContent, setHighlightedContent] = useState("");
-  const { openModal } = useModal();
+  const [isLiked, setIsLiked] = useState(() => {
+    // Intenta obtener el estado del like desde sessionStorage
+    const storedLike = sessionStorage.getItem(`liked-${id}`);
+    return storedLike ? JSON.parse(storedLike) : liked; // Si no hay en sessionStorage, usa el valor pasado como prop
+  });
+
+  const [likeCount, setLikeCount] = useState(() => {
+    // Intenta obtener la cantidad de likes desde sessionStorage
+    const storedLikeCount = sessionStorage.getItem(`likeCount-${id}`);
+    return storedLikeCount ? JSON.parse(storedLikeCount) : count; // Si no hay en sessionStorage, usa el valor pasado como prop
+  });
+
+  const [highlightedContent, setHighlightedContent] = useState(contenido);
+
   const { session } = useSession();
-  const userActive = JSON.parse(localStorage.getItem("user")) || null;
+  const userActive = JSON.parse(sessionStorage.getItem("user")) || null;
 
-  function handlerLike(e){
-    e.preventDefault();
-    fetch(`${baseDir}/api/like/create`,{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      credentials:"include",
-      body:JSON.stringify({
-        id_tweet:id,
-      })
-    })
-      .then((res)=> res.json())
-      .then((res)=> {
-        console.log(res);
-        setIsLiked(isLiked == true ? false : true);
-      })
-      .catch(err => console.log(err));
-  }
-
-  function toggleRePost() {
-    if (!session) {
-      openModal(true);
-    } else {
-      setIsRePost(!isRePost);
-      openModal(false);
-    }
-  }
-
-  async function handleDelete(id) {
-    const response = await fetch(`${baseDir}/api/tweets/delete/${id}`, {
-      method: "DELETE",
-    });
-    if (response.ok) {
-      window.location.href = "/dashboard";
-    } else {
-      alert("Error al eliminar mensaje del tablero");
-    }
-  }
-
+  // Resalta los hashtags en el contenido
   useEffect(() => {
     const regex = /#\w+/g;
     const result = contenido.replace(regex, (match) => {
@@ -60,58 +30,102 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count 
     setHighlightedContent(result);
   }, [contenido]);
 
+  useEffect(() => {
+    sessionStorage.setItem(`liked-${id}`, JSON.stringify(isLiked));
+    sessionStorage.setItem(`likeCount-${id}`, JSON.stringify(likeCount));
+  }, [isLiked, likeCount, id]);
+
+  const handlerLike = (e) => {
+    e.preventDefault();
+
+    fetch(`${baseDir}/api/like/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ id_tweet: id }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setIsLiked((prevState) => !prevState);
+        setLikeCount((prevState) => (isLiked ? prevState - 1 : prevState + 1));
+      })
+      .catch((err) => console.error("Like failed:", err));
+  };
+
+  const handleDeleteClick = () => {
+    confirm({
+      message: 'Are you sure you want to delete this tweet?',
+      onConfirm: () => handleDelete(id),
+      onCancel: () => {},
+    });
+  };
+
+  const handleDelete = async (id) => {
+    const response = await fetch(`${baseDir}/api/tweets/delete/${id}`, {
+      method: "DELETE",
+      credentials: "include"
+    });
+
+    if (response.ok) {
+      window.location.href = "/dashboard";
+    } else {
+      alert("Error al eliminar mensaje del tablero");
+    }
+  };
+
   return (
     <div className="dark:text-white h-auto block">
       <div className="flex flex-col bg-white dark:bg-black rounded-lg shadow-lg">
-        <div className="flex p-4">
+        <div className="flex p-4 w-full">
           <Link to={`/profile/${usuario}`}>
-          <picture className="flex justify-center items-center bg-no-repeat bg-center object-content">
-            <img
-              src={avatar}
-              width="100"
-              height="100"
-              alt="avatar"
-              className="rounded-full w-22 h-22"
-            />
-          </picture>
+            <picture className="flex justify-center items-center bg-no-repeat bg-center object-content">
+              <img
+                src={avatar}
+                width="100"
+                height="100"
+                alt="avatar"
+                className="rounded-full w-22 h-22"
+              />
+            </picture>
           </Link>
 
           <div className="flex-col justify-between w-full pl-4">
-            <div style={{display:'flex', Width:'100%',gap:'3px', justifyContent:'space-between', paddingRight:'10px'}}>
-            <div style={{width:'100%'}}>
-            <h5 className="font-semibold">
-              @{usuario} |{" "}
-              <span className="text-gray-400">
-                {categoria} · {fecha}{" "}
-              </span>
-                {session && (
-                  <span style={{float:'right'}} className={`${isLiked ? "text-red-500" : "text-white"}`}>{count}<i className={`fa-solid fa-heart cursor-pointer pl-2 ${isLiked ? "text-red-500" : "text-white"}`}
-                      onClick={(e)=> handlerLike(e)}></i>
+            <div style={{ display: 'flex', gap: '3px', justifyContent: 'space-between', paddingRight: '10px', width:"100%" }}>
+              <div style={{ width: '100%', display:"flex", alignItems:"flex-end", justifyContent:"space-between" }}>
+                <h5 className="font-semibold">
+                  @{usuario} |{" "}
+                  <span className="text-gray-400">
+                    {categoria} · {fecha}
                   </span>
-                )}
-                
-            </h5>
-            </div>
+                </h5>
+              </div>
+              {usuario === userActive?.username && (
+                <div style={{ display: "flex", flexDirection: "row", justifyContent: "right", alignItems: "flex-end" }}>
+                  <span>Editar</span>
+                  <span onClick={handleDeleteClick} className="cursor-pointer text-gray-500">Eliminar</span>
+                </div>
+              )}
             </div>
             <p
               className="font-sans text-lg text-gray-800 dark:text-white break-words line-clamp-3"
-              dangerouslySetInnerHTML={{ __html: highlightedContent }}
+              dangerouslySetInnerHTML={{ __html: highlightedContent }} // Usa highlightedContent
             />
           </div>
         </div>
-        <div className="flex justify-between items-center px-10 py-2 ml-20 text-gray-500">
-          {usuario === userActive?.username && (
-            <div className="flex gap-3 justify-end items-center w-full">
-              <p className="text-gray-500">
-                <i className="fa-solid fa-pen p-2"></i>Editar
-              </p>
-              <p
-                onClick={() => handleDelete(id)}
-                className="text-red-500 cursor-pointer"
-              >
-                <i className="fa-solid fa-close p-2"></i>Eliminar
-              </p>
-            </div>
+        <div>
+          {session && (
+            <span
+              style={{ float: 'right' }}
+              className={`pr-4 ${isLiked ? "text-red-500" : "text-white"}`}
+            >
+              {likeCount}
+              <i
+                className={`fa-solid fa-heart cursor-pointer pl-2 ${isLiked ? "text-red-500" : "text-white"}`}
+                onClick={(e) => handlerLike(e)}
+              ></i>
+            </span>
           )}
         </div>
         <hr className="border-t border-gray-300 dark:border-gray-700" />

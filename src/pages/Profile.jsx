@@ -3,6 +3,11 @@ import { baseDir } from "../path";
 import { useEffect, useState } from "react";
 import Tweet from "../components/Tweet.jsx";
 import { useParams } from "react-router-dom";
+import { useSession } from "../context/SessionContext.jsx";
+import {handlerDate} from "../handler/handlerDate.js"
+import Modal from "react-modal";
+
+Modal.setAppElement('#root'); // Asegúrate de establecer el elemento raíz
 
 export const Profile = () => {
     const [tweets, setTweets] = useState([]);
@@ -18,7 +23,11 @@ export const Profile = () => {
     });
     const [loading, setLoading] = useState(true);
     const { username } = useParams();
+    const { userData, setUserData } = useSession();
     const userActive = JSON.parse(localStorage.getItem("user"));
+
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     useEffect(() => {
         fetch(`${baseDir}/api/usuarios/${username}`, {
@@ -33,7 +42,6 @@ export const Profile = () => {
         .catch((err) => console.error(err));
     }, [username]);
 
-    // Obtener los tweets de este usuario
     useEffect(() => {
         fetch(`${baseDir}/api/tweets/profile/${username}`, {
             method: "GET"
@@ -43,7 +51,6 @@ export const Profile = () => {
         .catch((err) => console.error(err));
     }, [username]);
 
-    // Obtener la información sobre los seguidores y seguidos
     useEffect(() => {
         fetch(`${baseDir}/api/usuarios/follow/info/${username}`, {
             method: "GET",
@@ -51,15 +58,13 @@ export const Profile = () => {
         })
         .then(res => res.json())
         .then(res => {
-            console.log(res)
             setFollowers(res.Seguidores);
             setFollowing(res.Seguidos);
-            setSiguiendo(res.seSiguen == 0 ? false : true);
+            setSiguiendo(res.seSiguen === 0 ? false : true);
         })
         .catch(err => console.log(err));
     }, [username]);
 
-    // Manejo de la acción de seguir / dejar de seguir
     const handlerFollow = (e) => {
         e.preventDefault();
         fetch(`${baseDir}/api/usuarios/follow`, {
@@ -76,7 +81,7 @@ export const Profile = () => {
         .then((res) => {
             if (res.msg.startsWith("Ya no")) {
                 setSiguiendo(false);
-                setFollowers((prevFollowers) => prevFollowers - 1); 
+                setFollowers((prevFollowers) => prevFollowers - 1);
             } else {
                 setSiguiendo(true);
                 setFollowers((prevFollowers) => prevFollowers + 1);
@@ -85,7 +90,21 @@ export const Profile = () => {
         .catch((error) => console.error(error));
     };
 
-    // Renderizar la pantalla de carga mientras se obtienen los datos
+    // Eliminar cuenta
+    const handleDeleteAccount = () => {
+        // Aquí puedes hacer la llamada a la API para eliminar la cuenta
+        console.log("Cuenta eliminada");
+        setIsDeleteModalOpen(false); // Cerrar modal después de eliminar
+    };
+
+    // Editar perfil
+    const handleEditProfile = () => {
+        // Aquí puedes manejar la edición del perfil
+        console.log("Perfil editado");
+        setIsEditModalOpen(false); // Cerrar modal después de editar
+    };
+
+    // Pantalla de carga
     if (loading) {
         return (
             <div className="w-full h-full m-auto flex flex-col justify-center">
@@ -102,7 +121,7 @@ export const Profile = () => {
             <title>{`${usuario.name} ${usuario.lastname} | Perfil`}</title>
             <div>
                 <Nav />
-                <hr className="text-gray-300 my-6" />
+                <hr className="text-gray-300" />
             </div>
             <div className="flex flex-col justify-center items-center gap-6 py-4">
                 <img
@@ -111,7 +130,11 @@ export const Profile = () => {
                     className="w-32 h-32 rounded-full object-cover border-2 border-blue-500"
                 />
                 <div className="flex gap-4 items-center">
-                    <h4 className="text-xl font-semibold">@{usuario.username}</h4>
+                    <div className="flex flex-col items-center p-6 ">
+                        <h2 className="text-3xl font-semibold text-gray-800 dark:text-white mb-2">{usuario.name} {usuario.lastname}</h2>
+                        <h4 className="text-xl font-medium">@{usuario.username}</h4>
+                    </div>
+
                     {userActive.username !== usuario.username && (
                         <button
                             className={`px-4 py-2 rounded-full text-white font-semibold transition-all duration-300 ${siguiendo ? 'bg-blue-500' : 'bg-green-500'}`}
@@ -122,7 +145,22 @@ export const Profile = () => {
                     )}
                 </div>
                 <h5 className="text-gray-600 text-md">{usuario.email}</h5>
-                {userActive.username == usuario.username && <button className="mt-4 bg-red-500 text-white px-6 py-2 rounded-full hover:bg-red-600 transition duration-300">Eliminar cuenta</button>}
+                {userActive.username == usuario.username && (
+                    <div>
+                        <button
+                            onClick={() => setIsDeleteModalOpen(true)}
+                            className="mt-4 bg-red-500 text-white px-6 py-2 rounded-full hover:bg-red-600 transition duration-300"
+                        >
+                            Eliminar cuenta
+                        </button>
+                        <button
+                            onClick={() => setIsEditModalOpen(true)}
+                            className="mt-4 bg-yellow-500 text-white px-6 py-2 rounded-full hover:bg-yellow-600 transition duration-300"
+                        >
+                            Editar perfil
+                        </button>
+                    </div>
+                )}
                 <ul className="flex space-x-8 mt-6">
                     <li className="text-lg font-semibold">Seguidores: <i className="text-gray-500">{followers}</i></li>
                     <li className="text-lg font-semibold">Seguidos: <i className="text-gray-500">{following}</i></li>
@@ -135,7 +173,7 @@ export const Profile = () => {
                             <Tweet
                                 key={i.id_tweet || ix}
                                 avatar={i.avatar.startsWith("/") ? `${baseDir}${i.avatar}` : i.avatar}
-                                fecha={i.createdAt}
+                                fecha={handlerDate(i.createdAt)}
                                 usuario={i.username}
                                 contenido={i.content}
                             />
@@ -145,6 +183,69 @@ export const Profile = () => {
                     )}
                 </div>
             </div>
+
+            {/* Modal Eliminar Cuenta */}
+            <Modal
+                isOpen={isDeleteModalOpen}
+                onRequestClose={() => setIsDeleteModalOpen(false)}
+                contentLabel="Confirmación de eliminación"
+                className="modal dark:bg-gray-900"
+                overlayClassName="overlay"
+            >
+                <h2 className="text-2xl">¿Estás seguro de que deseas eliminar tu cuenta?</h2>
+                <p className="text-lg text-red-500">Esta acción es irreversible.</p>
+                <div className="flex justify-between mt-4">
+                    <button
+                        onClick={() => setIsDeleteModalOpen(false)}
+                        className="bg-gray-300 text-black px-4 py-2 rounded-full"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        onClick={handleDeleteAccount}
+                        className="bg-red-500 text-white px-6 py-2 rounded-full"
+                    >
+                        Eliminar
+                    </button>
+                </div>
+            </Modal>
+
+            {/* Modal Editar Perfil */}
+            <Modal
+                isOpen={isEditModalOpen}
+                onRequestClose={() => setIsEditModalOpen(false)}
+                contentLabel="Editar perfil"
+                
+                className="modal dark:bg-gray-900"
+                overlayClassName="overlay"
+            >
+                <h2 className="text-2xl dark:text-white text-black">Editar tu perfil</h2>
+                {/* Aquí podrías agregar un formulario para editar el perfil */}
+                <form className="text-black">
+                    <label htmlFor="name" className="dark:text-white text-black block mt-4">Nombre:</label>
+                    <input type="text" name="name" id="name" className="w-full p-2 border-2 border-gray-300 rounded-md" value={usuario.name} />
+                    <label htmlFor="lastname" className="dark:text-white text-black block mt-4">Apellido:</label>
+                    <input type="text" name="lastname" id="lastname" className="w-full p-2 border-2 border-gray-300 rounded-md" value={usuario.lastname} />
+                    <label htmlFor="email" className="dark:text-white text-black block mt-4">Correo electrónico:</label>
+                    <input type="email" name="email" id="email" className="w-full p-2 border-2 border-gray-300 rounded-md" value={usuario.email} />
+                    <label htmlFor="avatar" className="dark:text-white text-black block mt-4">Avatar:</label>
+                    <input type="text" name="avatar" id="avatar" className="w-full p-2 border-2 border-gray-300 rounded-md" value={usuario.avatar} />
+                </form>
+                <div className="flex justify-between mt-4">
+                    <button
+                        onClick={() => setIsEditModalOpen(false)}
+                        className="bg-gray-300 text-black px-4 py-2 rounded-full"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        onClick={handleEditProfile}
+                        className="bg-yellow-500 text-white px-6 py-2 rounded-full"
+                    >
+                        Guardar cambios
+                    </button>
+                </div>
+            </Modal>
         </div>
     );
 };

@@ -10,6 +10,7 @@ import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import {Profile} from "./pages/Profile.jsx"
 import Notificaciones from "./pages/Notifications.jsx";
+import "./index.css";
 
 createRoot(document.getElementById("root")).render(
   <SessionProvider>

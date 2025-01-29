@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useModal } from "../context/ModalContext";
 import { useNavigate } from "react-router-dom";
 import { baseDir } from "../path.js";
-
+ 
 const LoginModal = () => {
   const { isModalOpen, closeModal } = useModal();
   const [email, setEmail] = useState("");

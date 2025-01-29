@@ -1,4 +1,5 @@
 import Nav from '../components/Nav';
+import {LikeProvider} from "../context/LikesContext.jsx"
 import MensajesTablero from '../components/MensajesTablero';
 import Sugerencias from '../components/Sugerencias';
 import CategoriaContainer from '../components/CategoriaContainer';
@@ -23,7 +24,9 @@ const Dashboard = () => {
             </div>
 
             <div className="col-span-1 md:col-span-2 border-gray-300 dark:border-gray-700 p-4">
-              <MensajesTablero />
+              <LikeProvider>
+                <MensajesTablero />
+              </LikeProvider>
             </div>
 
             <div className="hidden md:flex flex-col md:col-span-1 border-l-2 border-gray-300 dark:border-gray-700 p-4">

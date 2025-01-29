@@ -5,10 +5,15 @@ import Tendencias from "./components/Tendencias.jsx";
 import Sugerencias from "./components/Sugerencias.jsx";
 import LoginModal from "./components/LoginModal.jsx";
 import { TendenciasProvider } from "./context/TendenciasContext.jsx";
+import { useSession } from "./context/SessionContext.jsx";
 
 const App = () => {
+  const {session} = useSession();
+
   return (
     <div className="flex flex-col min-h-screen">
+    { !session ? 
+    <div>
       <title>Tabl3ro - Tu sitio de mensajes favorito</title>
       <Nav />
       <hr className="border-gray-600" />
@@ -31,6 +36,8 @@ const App = () => {
         </div>
       </div>
       <LoginModal />
+      </div> : <div>{window.location.href = "/dashboard"}</div>
+    }
     </div>
   );
 };

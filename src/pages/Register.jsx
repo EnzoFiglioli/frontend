@@ -61,28 +61,28 @@ export const Register = () => {
   };
   
   return (
-    <div className="flex items-center justify-center min-h-screen text-white">
+    <div className="flex items-center justify-center min-h-screen text-white dark:text-white dark:bg-black">
       <title>Registrate | Tabl3ro</title>
       <Link to="/" className="absolute top-0 left-0 px-3 py-1">
         <i className="fa-solid fa-arrow-right origin-bottom -rotate-180 text-2xl"></i>
       </Link>
       <div className="p-7 rounded-lg shadow-md w-full max-w-md min-h-full border border-solid border-2 border-gray-200">
-        <h2 className="text-2xl font-semibold mb-6 text-center">Registro</h2>
+        <h2 className="text-2xl font-semibold mb-6 text-center white dark:text-white">Registro</h2>
         <form onSubmit={handleSubmit} >
           <div className="mb-4">
-            <label htmlFor="username" className="block">Nombre de usuario</label>
+            <label htmlFor="username" className="block white dark:text-white">Nombre de usuario</label>
             <input
               type="text"
               id="username"
               name="username"
               value={formData.username}
               onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300 text-black"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300 dark:text-white"
               required
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="name" className="block">Nombre</label>
+            <label htmlFor="name" className="block white dark:text-white">Nombre</label>
             <input
               type="text"
               name="name"

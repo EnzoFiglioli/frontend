@@ -5,6 +5,7 @@ import { useSession } from "../context/SessionContext.jsx";
 import { baseDir } from "../path.js";
 import data from "../data/data.json";
 import { handlerDate } from "../handler/handlerDate.js";
+import { useLike } from "../context/LikesContext.jsx";
 
 const MensajesTablero = () => {
   const [mensajes, setMensajes] = useState([]);
@@ -13,20 +14,27 @@ const MensajesTablero = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState(sessionStorage.getItem("section") || "Para ti");
-
+  const {likesContainerContext, setLikesContainerContext, likesCountContext, setLikesCountContext} = useLike();  
   const { session } = useSession();
   const { username } = JSON.parse(localStorage.getItem("user")) || {};
 
   useEffect(() => {
     if (session) {
-      fetch(`${baseDir}/api/like/info`, { method: "GET", credentials: "include" })
-        .then(res => res.json())
-        .then(res => {
-          console.log(res);
-          setLikesCount(res.likesCount);
-          setLikesContainer(res.likesUser);
-        })
-        .catch(err => console.error(err));
+      if (likesCountContext.length === 0 && likesContainerContext.length === 0) {
+        fetch(`${baseDir}/api/like/info`, { method: "GET", credentials: "include" })
+          .then(res => res.json())
+          .then(res => {
+            console.log("Likes info from API:", res); // Asegúrate de que estamos recibiendo los datos correctos
+            setLikesCount(res.likesCount); // Esto tiene la cantidad de likes por tweet
+            setLikesCountContext(res.likesCount);
+            setLikesContainerContext(res.likesUser); // Esto tiene la lista de usuarios que dieron like
+            setLikesContainer(res.likesUser);
+          })
+          .catch(err => console.error("Error fetching likes:", err));
+      } else {
+        setLikesContainer(likesContainerContext);
+        setLikesCount(likesCountContext);
+      }
     }
   }, [session]);
 
@@ -153,29 +161,33 @@ const MensajesTablero = () => {
         </ul>
       )}
       {mensajes.length > 0 ? (
-        mensajes.map((msg, index) => {
-          const isLiked = likesContainer.some(like => like.id_tweet == msg.id);
-          const cantidad = likesCount.find(i => i.id_tweet == msg.id)?.cantidad || 0;
-          return msg.contenido ? (
-            <Tweet
-              key={`msg-${index}`}
-              contenido={msg.contenido}
-              fecha={handlerDate(msg.fecha)}
-              usuario={msg.usuario}
-              categoria={msg.categoria}
-              avatar={msg.avatar}
-              id={msg.id}
-              liked={isLiked}
-              count={cantidad}
-            />
-          ) : (
-            <div key={`msg-${index}`}>Contenido no disponible</div>
-          )}
-        )) : (
-        <div className="flex justify-center mt-3">
-          <p>No hay mensajes disponibles.</p>
-        </div>
-      )}
+  mensajes.map((msg, index) => {
+    // Verificar si el tweet tiene un like
+    const isLiked = likesContainer.some(like => like.id_tweet == msg.id); 
+    const cantidad = likesCount.find(i => i.id_tweet == msg.id)?.cantidad || 0; // Encontrar la cantidad de likes
+
+    return msg.contenido ? (
+      <Tweet
+        key={`msg-${index}`}
+        contenido={msg.contenido}
+        fecha={handlerDate(msg.fecha)}
+        usuario={msg.usuario}
+        categoria={msg.categoria}
+        avatar={msg.avatar}
+        id={msg.id}
+        liked={isLiked} // Propaga el estado de "liked"
+        count={cantidad} // Propaga la cantidad de likes
+      />
+    ) : (
+      <div key={`msg-${index}`}>Contenido no disponible</div>
+    );
+  })
+) : (
+  <div className="flex justify-center mt-3">
+    <p>No hay mensajes disponibles.</p>
+  </div>
+)}
+
     </div>
   );
 };
