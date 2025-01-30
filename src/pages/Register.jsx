@@ -1,169 +1,141 @@
-import { useEffect, useState } from 'react';
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import {baseDir} from "../path.js";
+import profile from "../data/profile.json";
+import { baseDir } from "../path.js";
+import {ArrowLeft} from "lucide-react";
+
+const AvatarSelection = ({ onNext, setMainAvatar, mainAvatar }) => {
+  return (
+    <div className="flex flex-col items-center">
+      <img src={mainAvatar} alt="avatar" />
+      <h2 className="text-xl font-semibold mb-4">Elige tu Avatar</h2>
+      <div className="flex flex-wrap gap-2">
+        {profile.map((i, index) => (
+          <img
+            key={index}
+            src={i.image}
+            alt={`avatar-${i.id}`}
+            className="w-16 h-16 rounded-full cursor-pointer hover:opacity-75"
+            onClick={() => {
+              setMainAvatar(i.image);
+            }}
+          />
+        ))}
+      </div>
+      <button onClick={onNext} className="px-4 py-2 bg-blue-500 text-white rounded-lg">Siguiente</button>
+
+    </div>
+  );
+};
+
+const UsernameForm = ({ formData, setFormData, onNext, onBack }) => (
+  <div className="flex flex-col">
+    <h2 className="text-xl font-semibold mb-4">Tu Nombre de Usuario</h2>
+    <input
+      type="text"
+      name="username"
+      value={formData.username}
+      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+      className="w-full px-3 py-2 border rounded-lg"
+      required
+      placeholder="Nombre de Usuario"
+    />
+    <div className="flex justify-between mt-4">
+      <button onClick={onBack} className="px-4 py-2 bg-gray-300 rounded-lg">Atrás</button>
+      <button onClick={onNext} className="px-4 py-2 bg-blue-500 text-white rounded-lg">Siguiente</button>
+    </div>
+  </div>
+);
+
+const NameAndLastName = ({ formData, setFormData, onNext, onBack }) => (
+  <div className="flex flex-col">
+    <h2 className="text-xl font-semibold mb-4">Nombre y Apellido</h2>
+    <input
+      type="text"
+      name="name"
+      value={formData.name}
+      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+      className="w-full px-3 py-2 border rounded-lg"
+      required
+      placeholder="Nombre"
+    />
+    <input
+      type="text"
+      name="lastname"
+      value={formData.lastname}
+      placeholder="Apellido"
+      onChange={(e) => setFormData({ ...formData, lastname: e.target.value })}
+      className="w-full px-3 py-2 border rounded-lg mt-2"
+      required
+    />
+    <div className="flex justify-between mt-4">
+      <button onClick={onBack} className="px-4 py-2 bg-gray-300 rounded-lg">Atrás</button>
+      <button onClick={onNext} className="px-4 py-2 bg-blue-500 text-white rounded-lg">Siguiente</button>
+    </div>
+  </div>
+);
+
+
+const EmailPasswordForm = ({ formData, setFormData, onSubmit, onBack }) => (
+  <div className="flex flex-col">
+    <h2 className="text-xl font-semibold mb-4">Correo y Contraseña</h2>
+    <input
+      type="email"
+      name="email"
+      placeholder="Correo Electrónico"
+      value={formData.email}
+      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+      className="w-full px-3 py-2 border rounded-lg"
+      required
+    />
+    <input
+      type="password"
+      name="password"
+      value={formData.password}
+      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+      className="w-full px-3 py-2 border rounded-lg mt-2"
+      placeholder="Contraseña"
+      required
+    />
+    <input 
+    type="password"
+    name="password"
+    value={formData.password}
+    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+    className="w-full px-3 py-2 border rounded-lg mt-2"
+    placeholder="Repetir Contraseña"
+    />
+    <div className="flex justify-between mt-4">
+      <button onClick={onBack} className="px-4 py-2 bg-gray-300 rounded-lg">Atrás</button>
+      <button onClick={onSubmit} className="px-4 py-2 bg-green-500 text-white rounded-lg">Finalizar</button>
+    </div>
+  </div>
+);
 
 export const Register = () => {
+  const [step, setStep] = useState(1);
+  const [mainAvatar, setMainAvatar] = useState("https://cdn0.iconfinder.com/data/icons/superhero-2/256/Batman-512.png");
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    name: '',
-    lastname: '',
-    avatar: null
+    username: "",
+    email: "",
+    password: "",
   });
-
-  if(baseDir.startsWith("http://tabl3ro")){
-    useEffect(()=>{
-      fetch("../data/profile.json")
-      .then(res => res.json())
-      .then(data => console.log(data))
-      .catch(err => console.error(err));
-  },[])   
-}
-
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-
-    if (name === "avatar") {
-      
-      if (files && files[0]) {
-        const file = files[0];
-        if (file.type.startsWith('image/')) {
-          setFormData((prevData) => ({
-            ...prevData,
-            avatar: file,
-          }));
-        } else {
-          alert('Por favor, selecciona un archivo de imagen.');
-        }
-      }
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
-    }
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formDataToSend = new FormData();
-    
-    for (let key in formData) {
-      formDataToSend.append(key, formData[key]);
-    }
-
-    fetch(`${baseDir}/api/usuarios/`, {
-      method: "POST",
-      body: formDataToSend,
-    })
-      .then((response) => {
-        console.log({response, formData});
-        return window.location.href = "/";
-      })
-      .then((data) => {
-        console.log("Registro exitoso:", data);
-      })
-      .catch((error) => {
-        console.error("Error al registrar el usuario:", error);
-      });
+    console.log("Registro enviado:", formData);
   };
-  
+
   return (
-    <div className="flex items-center justify-center min-h-screen text-black dark:text-white dark:bg-black">
-      <title>Registrate | Tabl3ro</title>
-      <Link to="/" className="absolute top-0 left-0 px-3 py-1">
-        <i className="fa-solid fa-arrow-right origin-bottom -rotate-180 text-2xl"></i>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <Link to="/dashboard" className="absolute top-4 left-4 flex items-center dark:text-white text-black hover:underline">
+        <ArrowLeft size={24} className="mr-1" /> Volver
       </Link>
-      <div className="p-7 rounded-lg shadow-md w-full max-w-md min-h-full border border-solid border-2 border-gray-200">
-        <h2 className="text-2xl font-semibold mb-6 text-center white dark:text-white">Registro</h2>
-        <form onSubmit={handleSubmit} >
-          <div className="mb-4">
-            <label htmlFor="username" className="block white dark:text-white">Nombre de usuario</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300 dark:text-white"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="name" className="block white dark:text-white">Nombre</label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300 text-black"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="lastname" className="block">Apellido</label>
-            <input
-              type="text"
-              name="lastname"
-              id="lastname"
-              value={formData.lastname}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300 text-black"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="file" className="block">Imagen</label>
-            {
-              baseDir.startsWith("http://localhost") ?
-              <input
-                type="file"
-                name="avatar"
-                id="avatar"
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300 text-white"
-                required
-                /> 
-                :
-                <div>
-                  
-                </div>
-              
-            }
-          </div>
-          <div className="mb-4">
-            <label htmlFor="email" className="block">Correo electrónico</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300 text-black"
-              required
-            />
-          </div>
-          <div className="mb-6">
-            <label htmlFor="password" className="block">Contraseña</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300 text-black"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
-          >
-            Registrarse
-          </button>
-        </form>
+      <div className="p-7 rounded-lg shadow-md w-full max-w-md bg-white">
+        {step === 1 && <AvatarSelection onNext={() => setStep(2)} setMainAvatar={setMainAvatar} mainAvatar={mainAvatar} />}
+        {step === 2 && <UsernameForm formData={formData} setFormData={setFormData} onNext={() => setStep(3)} onBack={() => setStep(1)} />}
+        {step === 3 && <NameAndLastName formData={formData} setFormData={setFormData} onNext={() => setStep(4)} onBack={() => setStep(3)} />}
+        {step === 4 && <EmailPasswordForm formData={formData} setFormData={setFormData} onSubmit={handleSubmit} onBack={() => setStep(4)} />}
       </div>
     </div>
   );
