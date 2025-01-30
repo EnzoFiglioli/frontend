@@ -56,9 +56,6 @@ const Nav = () => {
             <Link to="/dashboard" aria-label="Inicio">
               <i className="fa-solid fa-house text-black dark:text-white"></i>
             </Link>
-            <Link to="/notifications" aria-label="Notificaciones">
-              <i className="fa-solid fa-bell text-black dark:text-white"></i>
-            </Link>
             <Link to={`/profile/${user.username}`} className="text-black dark:text-white" aria-label="Perfil">
               Perfil
             </Link>

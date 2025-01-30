@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
 import {baseDir} from "../path.js";
 
@@ -11,6 +11,13 @@ export const Register = () => {
     lastname: '',
     avatar: null
   });
+
+  baseDir.startsWith("http://tabl3ro") && useEffect(()=>{
+    fetch("../data/profile.json")
+      .then(res => res.json())
+      .then(data => console.log(data))
+      .catch(err => console.error(err));
+  },[]) 
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -107,14 +114,22 @@ export const Register = () => {
           </div>
           <div className="mb-4">
             <label htmlFor="file" className="block">Imagen</label>
-            <input
-              type="file"
-              name="avatar"
-              id="avatar"
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300 text-white"
-              required
-            />
+            {
+              baseDir.startsWith("http://localhost") ?
+              <input
+                type="file"
+                name="avatar"
+                id="avatar"
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300 text-white"
+                required
+                /> 
+                :
+                <div>
+                  
+                </div>
+              
+            }
           </div>
           <div className="mb-4">
             <label htmlFor="email" className="block">Correo electrónico</label>
