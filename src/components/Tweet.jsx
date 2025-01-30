@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useSession } from "../context/SessionContext.jsx";
 import { baseDir } from "../path.js";
 
-const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count }) => {
+const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count, name, lastname }) => {
   const [isLiked, setIsLiked] = useState(() => {
     // Intenta obtener el estado del like desde sessionStorage
     const storedLike = sessionStorage.getItem(`liked-${id}`);
@@ -120,7 +120,7 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count 
             <div style={{ display: 'flex', gap: '3px', justifyContent: 'space-between', paddingRight: '10px', width:"100%" }}>
               <div style={{ width: '100%', display:"flex", alignItems:"flex-end", justifyContent:"space-between" }}>
                 <h5 className="font-semibold">
-                  @{usuario} |{" "}
+                  {name} {lastname} - <i className="dark:text-gray-300">@{usuario}</i> |{" "}
                   <span className="text-gray-400">
                     {categoria} · {fecha}
                   </span>

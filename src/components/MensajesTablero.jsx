@@ -17,17 +17,16 @@ const MensajesTablero = () => {
   const {likesContainerContext, setLikesContainerContext, likesCountContext, setLikesCountContext} = useLike();  
   const { session } = useSession();
   const { username } = JSON.parse(localStorage.getItem("user")) || {};
-
+  
   useEffect(() => {
     if (session) {
       if (likesCountContext.length === 0 && likesContainerContext.length === 0) {
         fetch(`${baseDir}/api/like/info`, { method: "GET", credentials: "include" })
           .then(res => res.json())
           .then(res => {
-            console.log("Likes info from API:", res); // Asegúrate de que estamos recibiendo los datos correctos
-            setLikesCount(res.likesCount); // Esto tiene la cantidad de likes por tweet
+            setLikesCount(res.likesCount);
             setLikesCountContext(res.likesCount);
-            setLikesContainerContext(res.likesUser); // Esto tiene la lista de usuarios que dieron like
+            setLikesContainerContext(res.likesUser);
             setLikesContainer(res.likesUser);
           })
           .catch(err => console.error("Error fetching likes:", err));
@@ -64,7 +63,6 @@ const MensajesTablero = () => {
         .then((res) => res.json())
         .then((res) => {
           const sortedMessages = res.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
           setMensajes(
             sortedMessages.map((i) => {
               return {
@@ -74,6 +72,8 @@ const MensajesTablero = () => {
                 categoria: i.categoria,
                 usuario: i.username,
                 id: i.id_tweet,
+                name: i.name,
+                lastname: i.lastname
               };
             })
           );
@@ -104,6 +104,8 @@ const MensajesTablero = () => {
           res.map((i) => ({
             id: i.id_tweet,
             usuario: i.username,
+            name: i.name,
+            lastname: i.lastname,
             contenido: i.content,
             avatar: i.avatar.startsWith("/uploads") ? `${baseDir}${i.avatar}` : i.avatar,
             fecha: i.createdAt,
@@ -162,7 +164,6 @@ const MensajesTablero = () => {
       )}
       {mensajes.length > 0 ? (
   mensajes.map((msg, index) => {
-    // Verificar si el tweet tiene un like
     const isLiked = likesContainer.some(like => like.id_tweet == msg.id); 
     const cantidad = likesCount.find(i => i.id_tweet == msg.id)?.cantidad || 0; // Encontrar la cantidad de likes
 
@@ -177,6 +178,8 @@ const MensajesTablero = () => {
         id={msg.id}
         liked={isLiked}
         count={cantidad}
+        name={msg.name}
+        lastname={msg.lastname}
         />
     ) : (
       <div key={`msg-${index}`}>Contenido no disponible</div>
