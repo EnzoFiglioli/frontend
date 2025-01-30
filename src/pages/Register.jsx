@@ -12,12 +12,14 @@ export const Register = () => {
     avatar: null
   });
 
-  baseDir.startsWith("http://tabl3ro") && useEffect(()=>{
-    fetch("../data/profile.json")
+  if(baseDir.startsWith("http://tabl3ro")){
+    useEffect(()=>{
+      fetch("../data/profile.json")
       .then(res => res.json())
       .then(data => console.log(data))
       .catch(err => console.error(err));
-  },[]) 
+  },[])   
+}
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
