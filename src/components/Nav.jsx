@@ -29,10 +29,10 @@ const Nav = () => {
   const handleLogout = () => {
     localStorage.clear();
     setSession(false);
-
+    sessionStorage.clear();
     fetch(`${baseDir}/api/usuarios/logout`, {
       method: "GET",
-      credentials: "include",  // Esto asegura que se envíe la cookie con la solicitud
+      credentials: "include",
     })
       .then(res => res.json())
       .then(res => {

@@ -5,40 +5,17 @@ import { useSession } from "../context/SessionContext.jsx";
 import { baseDir } from "../path.js";
 import data from "../data/data.json";
 import { handlerDate } from "../handler/handlerDate.js";
-import { useLike } from "../context/LikesContext.jsx";
 
 const MensajesTablero = () => {
   const [mensajes, setMensajes] = useState([]);
-  const [likesContainer, setLikesContainer] = useState([]);
-  const [likesCount, setLikesCount] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState(sessionStorage.getItem("section") || "Para ti");
-  const {likesContainerContext, setLikesContainerContext, likesCountContext, setLikesCountContext} = useLike();  
   const { session } = useSession();
   const { username } = JSON.parse(localStorage.getItem("user")) || {};
-  
-  useEffect(() => {
-    if (session) {
-      if (likesCountContext.length === 0 && likesContainerContext.length === 0) {
-        fetch(`${baseDir}/api/like/info`, { method: "GET", credentials: "include" })
-          .then(res => res.json())
-          .then(res => {
-            setLikesCount(res.likesCount);
-            setLikesCountContext(res.likesCount);
-            setLikesContainerContext(res.likesUser);
-            setLikesContainer(res.likesUser);
-          })
-          .catch(err => console.error("Error fetching likes:", err));
-      } else {
-        setLikesContainer(likesContainerContext);
-        setLikesCount(likesCountContext);
-      }
-    }
-  }, [session]);
 
   useEffect(() => {
-    if (activeTab === "Para ti") {
+    if (activeTab === "Para ti" || activeTab === undefined) {
       handlerForYou();
     } else {
       handlerForFollowing();
@@ -62,10 +39,10 @@ const MensajesTablero = () => {
       })
         .then((res) => res.json())
         .then((res) => {
-          const sortedMessages = res.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-          setMensajes(
-            sortedMessages.map((i) => {
-              return {
+          if (res.length > 0) {
+            const sortedMessages = res.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            setMensajes(
+              sortedMessages.map((i) => ({
                 contenido: i.content,
                 avatar: i.avatar.startsWith("/uploads") ? `${baseDir}${i.avatar}` : i.avatar,
                 fecha: i.createdAt,
@@ -73,14 +50,19 @@ const MensajesTablero = () => {
                 usuario: i.username,
                 id: i.id_tweet,
                 name: i.name,
-                lastname: i.lastname
-              };
-            })
-          );
+                lastname: i.lastname,
+                likes: i.likes,
+                likesActive: i.likeActive
+              }))
+            );
+          } else {
+            setMensajes([]);
+          }
           setLoading(false);
         })
         .catch((err) => {
           setError(err.message);
+          console.log({handlerForU:err})
           setLoading(false);
         });
     } else {
@@ -88,9 +70,10 @@ const MensajesTablero = () => {
       setLoading(false);
     }
   }
+  
 
   function handlerForFollowing() {
-    if(!session){
+    if (!session) {
       setLoading(false);
       return setMensajes(data);
     }
@@ -100,23 +83,30 @@ const MensajesTablero = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        setMensajes(
-          res.map((i) => ({
-            id: i.id_tweet,
-            usuario: i.username,
-            name: i.name,
-            lastname: i.lastname,
-            contenido: i.content,
-            avatar: i.avatar.startsWith("/uploads") ? `${baseDir}${i.avatar}` : i.avatar,
-            fecha: i.createdAt,
-            categoria: i.categoria,
-          })) || []
-        );
+        if (res.length > 0) {
+          setMensajes(
+            res.map((i) => ({
+              id: i.id_tweet,
+              usuario: i.username,
+              name: i.name,
+              lastname: i.lastname,
+              contenido: i.content,
+              avatar: i.avatar.startsWith("/uploads") ? `${baseDir}${i.avatar}` : i.avatar,
+              fecha: i.createdAt,
+              categoria: i.categoria,
+            }))
+          );
+        } else {
+          setMensajes([]);
+        }
         setLoading(false);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
   }
-
+  
   if (loading) {
     return (
       <div className="loader-container">
@@ -164,9 +154,6 @@ const MensajesTablero = () => {
       )}
       {mensajes.length > 0 ? (
   mensajes.map((msg, index) => {
-    const isLiked = likesContainer.some(like => like.id_tweet == msg.id); 
-    const cantidad = likesCount.find(i => i.id_tweet == msg.id)?.cantidad || 0; // Encontrar la cantidad de likes
-
     return msg.contenido ? (
       <Tweet
         key={`msg-${index}`}
@@ -176,8 +163,8 @@ const MensajesTablero = () => {
         categoria={msg.categoria}
         avatar={msg.avatar}
         id={msg.id}
-        liked={isLiked}
-        count={cantidad}
+        liked={msg.likesActive}
+        count={msg.likes}
         name={msg.name}
         lastname={msg.lastname}
         />
@@ -190,7 +177,6 @@ const MensajesTablero = () => {
     <p>No hay mensajes disponibles.</p>
   </div>
 )}
-
     </div>
   );
 };

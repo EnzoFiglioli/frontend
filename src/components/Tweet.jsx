@@ -5,24 +5,22 @@ import { baseDir } from "../path.js";
 
 const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count, name, lastname }) => {
   const [isLiked, setIsLiked] = useState(() => {
-    // Intenta obtener el estado del like desde sessionStorage
     const storedLike = sessionStorage.getItem(`liked-${id}`);
     try {
       return storedLike ? JSON.parse(storedLike) : liked;
     } catch (e) {
       console.error('Error al parsear isLiked desde sessionStorage:', e);
-      return liked; // Valor por defecto en caso de error
+      return liked;
     }
   });
   
   const [likeCount, setLikeCount] = useState(() => {
-    // Intenta obtener la cantidad de likes desde sessionStorage
     const storedLikeCount = sessionStorage.getItem(`likeCount-${id}`);
     try {
-      return storedLikeCount ? JSON.parse(storedLikeCount) : count; // Si no hay en sessionStorage, usa el valor pasado como prop
+      return storedLikeCount ? JSON.parse(storedLikeCount) : count;
     } catch (e) {
       console.error('Error al parsear likeCount desde sessionStorage:', e);
-      return count; // Valor por defecto en caso de error
+      return count;
     }
   });
   
@@ -32,7 +30,6 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count,
   const { session } = useSession();
   const userActive = JSON.parse(sessionStorage.getItem("user")) || null;
 
-  // Resalta los hashtags en el contenido
   useEffect(() => {
     const regex = /#\w+/g;
     const result = contenido.replace(regex, (match) => {
@@ -58,11 +55,10 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count,
       body: JSON.stringify({ id_tweet: id }),
     })
       .then((res) => {
-        // Verifica que la respuesta es un JSON válido
         if (!res.ok) {
           throw new Error("Error en la respuesta del servidor");
         }
-        return res.json(); // Solo parsea si la respuesta es OK
+        return res.json();
       })
       .then((res) => {
         setIsLiked((prevState) => !prevState);
@@ -70,7 +66,6 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count,
       })
       .catch((err) => console.error("Like failed:", err));
   };
-  
 
   const handleDeleteClick = () => {
     confirm({
@@ -91,7 +86,7 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count,
       return;
     }
   
-    const data = await response.json(); // Asegúrate de que la respuesta sea un JSON
+    const data = await response.json();
     if (data.success) {
       window.location.href = "/dashboard";
     } else {
@@ -135,7 +130,7 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count,
             </div>
             <p
               className="font-sans text-lg text-gray-800 dark:text-white break-words line-clamp-3"
-              dangerouslySetInnerHTML={{ __html: highlightedContent }} // Usa highlightedContent
+              dangerouslySetInnerHTML={{ __html: highlightedContent }}
             />
           </div>
         </div>

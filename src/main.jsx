@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import {Profile} from "./pages/Profile.jsx"
 import Notificaciones from "./pages/Notifications.jsx";
 import "./index.css";
+import App from "./App.jsx";
 
 createRoot(document.getElementById("root")).render(
   <SessionProvider>
@@ -17,7 +18,7 @@ createRoot(document.getElementById("root")).render(
       <ModalProvider>
         <TweetProvider>
             <Routes>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/" element={<App />} />
               <Route path="register" element={<Register />} />
               <Route path="/dashboard" element={<Dashboard />}/>
               <Route path="/profile/:username" element={<Profile />}/>

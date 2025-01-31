@@ -7,7 +7,12 @@ import { ArrowLeft } from "lucide-react";
 const AvatarSelection = ({ onNext, setMainAvatar, mainAvatar, setFormData }) => {
   return (
     <div className="flex flex-col items-center">
-      <img src={mainAvatar} alt="avatar" className="w-24 h-24 rounded-full" />
+      <img 
+        src={mainAvatar} 
+        alt="avatar" 
+        className="rounded-full" 
+        style={{ width:"80%", height:"80%" }} 
+      />
       <h2 className="text-xl font-semibold mb-4">Elige tu Avatar</h2>
       <div className="flex flex-wrap gap-2">
         {profile.map((i, index) => (
@@ -145,7 +150,7 @@ export const Register = () => {
       .then((res) => {
         console.log(res);
         if (res.ok) {
-          navigate("/dashboard");
+          window.location.href = "/dashboard";
         }
       })
       .catch((err) => console.log(err));
@@ -153,7 +158,7 @@ export const Register = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Link to="/dashboard" className="absolute top-4 left-4 flex items-center text-black hover:underline">
+      <Link to="/" className="absolute top-4 left-4 flex items-center text-black hover:underline">
         <ArrowLeft size={24} className="mr-1" /> Volver
       </Link>
       <div className="p-7 rounded-lg shadow-md w-full max-w-md bg-white">

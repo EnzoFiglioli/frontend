@@ -31,7 +31,6 @@ export const Profile = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-    // Obtener datos del perfil
     useEffect(() => {
         fetch(`${baseDir}/api/usuarios/${username}`, {
             method: "GET",
@@ -226,6 +225,8 @@ export const Profile = () => {
                                         contenido={i.content}
                                         name={usuario.name}
                                         lastname={usuario.lastname}
+                                        count={i.likes}
+                                        liked={i.likesActive}
                                     />
                                 ))
                             ) : (
