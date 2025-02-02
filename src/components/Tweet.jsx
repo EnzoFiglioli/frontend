@@ -4,39 +4,32 @@ import { useSession } from "../context/SessionContext.jsx";
 import { baseDir } from "../path.js";
 import Verification from "./Verification.jsx";
 
-const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count, name, lastname, image, verfication }) => {
+const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count, name, lastname, image, verification }) => {
   const [isLiked, setIsLiked] = useState(() => {
     const storedLike = sessionStorage.getItem(`liked-${id}`);
     try {
       return storedLike ? JSON.parse(storedLike) : liked;
-    } catch (e) {
-      console.error('Error al parsear isLiked desde sessionStorage:', e);
+    } catch {
       return liked;
     }
   });
-  
+
   const [likeCount, setLikeCount] = useState(() => {
     const storedLikeCount = sessionStorage.getItem(`likeCount-${id}`);
     try {
       return storedLikeCount ? JSON.parse(storedLikeCount) : count;
-    } catch (e) {
-      console.error('Error al parsear likeCount desde sessionStorage:', e);
+    } catch {
       return count;
     }
   });
-  
 
   const [highlightedContent, setHighlightedContent] = useState(contenido);
-
   const { session } = useSession();
   const userActive = JSON.parse(sessionStorage.getItem("user")) || null;
 
   useEffect(() => {
     const regex = /#\w+/g;
-    const result = contenido.replace(regex, (match) => {
-      return `<span class="text-blue-500 cursor-pointer" hover:text-blue-200>${match}</span>`;
-    });
-    setHighlightedContent(result);
+    setHighlightedContent(contenido.replace(regex, (match) => `<span class='text-blue-500 cursor-pointer hover:text-blue-200'>${match}</span>`));
   }, [contenido]);
 
   useEffect(() => {
@@ -46,121 +39,63 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count,
 
   const handlerLike = (e) => {
     e.preventDefault();
-  
     fetch(`${baseDir}/api/like/create`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ id_tweet: id }),
+      body: JSON.stringify({ id_tweet: id })
     })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Error en la respuesta del servidor");
-        }
-        return res.json();
-      })
-      .then((res) => {
-        console.log(res)
+      .then((res) => res.ok ? res.json() : Promise.reject("Error en la respuesta del servidor"))
+      .then(() => {
         setIsLiked((prevState) => !prevState);
         setLikeCount((prevState) => (isLiked ? prevState - 1 : prevState + 1));
       })
-      .catch((err) => console.error("Like failed:", err));
-  };
-
-  const handleDeleteClick = () => {
-    confirm({
-      message: 'Estas seguro que quieres eliminar este mensaje en el tablero?',
-      onConfirm: () => handleDelete(id),
-      onCancel: () => {},
-    });
+      .catch(console.error);
   };
 
   const handleDelete = async (id) => {
-    const response = await fetch(`${baseDir}/api/tweets/delete/${id}`, {
-      method: "DELETE",
-      credentials: "include"
-    });
-  
-    if (!response.ok) {
-      console.error("Error al eliminar el tweet");
-      return;
-    }
-  
+    const response = await fetch(`${baseDir}/api/tweets/delete/${id}`, { method: "DELETE", credentials: "include" });
+    if (!response.ok) return;
     const data = await response.json();
-    if (data.success) {
-      window.location.href = "/dashboard";
-    } else {
-      alert("Error al eliminar mensaje del tablero");
-    }
+    if (data.success) window.location.href = "/dashboard";
   };
-  
 
   return (
-  <div>
     <div className="dark:text-white h-auto block">
       <div className="flex flex-col bg-white dark:bg-black rounded-lg shadow-lg">
-        <div className="flex p-4 w-full">
-        <Link to={`/profile/${usuario}`}>
-          <div className="flex justify-center items-center w-24 h-24">
-            <img
-              src={avatar}
-              alt="avatar"
-              className="rounded-full w-full h-full object-cover"
-            />
-          </div>
-        </Link>
-          <div className="flex-col pl-4">
-            <div className="flex-col justify-between w-full">
-              <div style={{ display: 'flex', gap: '3px', justifyContent: 'space-between', paddingRight: '10px', width: "100%" }}>
-                <div style={{ width: '100%', display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <h5 className="font-semibold" style={{ display: 'inline-flex', alignItems: 'center' }}>
-                    {name} {lastname}
-                    <span>{verfication ? <Verification /> : ""} </span> 
-                    
-                    <i className="ml-2 dark:text-gray-300">@{usuario} |</i>
-                    <span className="text-gray-400 pl-2"> {categoria} · {fecha}
-                    </span>
-                  </h5>
-                </div>
-              </div>
+        <div className="flex p-4 w-full items-start">
+          <Link to={`/profile/${usuario}`} className="flex-shrink-0">
+            <img src={avatar} alt="avatar" className="rounded-full w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 object-cover" />
+          </Link>
+          <div className="flex flex-col pl-4 w-full">
+            <div className="flex justify-between items-center w-full">
+              <h5 className="font-semibold flex items-center text-base sm:text-lg md:text-xl">
+                {name} {lastname} {verification && <Verification />} 
+                <span className="ml-2 dark:text-gray-300 text-xs sm:text-sm md:text-base whitespace-nowrap">@{usuario} | {categoria} · {fecha}</span>
+              </h5>
             </div>
             {usuario === userActive?.username && (
-              <div style={{ display: "flex", flexDirection: "row", justifyContent: "flex-end", alignItems: "center" }}>
-                <span className="mr-4 cursor-pointer">Editar</span>
-                <span onClick={handleDeleteClick} className="cursor-pointer text-gray-500">Eliminar</span>
+              <div className="flex justify-end items-center gap-4 mt-2">
+                <span className="cursor-pointer text-sm md:text-base">Editar</span>
+                <span onClick={() => handleDelete(id)} className="cursor-pointer text-gray-500 text-sm md:text-base">Eliminar</span>
               </div>
             )}
-            <p
-              className="font-sans text-lg text-gray-800 dark:text-white break-words line-clamp-3"
-              dangerouslySetInnerHTML={{ __html: highlightedContent }}
-            />
-            {image && 
-              <img src={image} alt="meme" className="px-4 py-4 rounded w-full h-64 object-cover" />
-            }
+            <p className="font-sans text-lg text-gray-800 dark:text-white break-words line-clamp-3" dangerouslySetInnerHTML={{ __html: highlightedContent }} />
+            {image && <img src={image} alt="meme" className="px-4 py-4 rounded w-full h-64 object-cover" />}
           </div>
         </div>
-        <div>
-          {session && (
-            <span
-              style={{ float: 'right' }}
-              className={`pr-4 ${isLiked ? "text-red-500" : "text-white"}`}
-            >
+        {session && (
+          <div className="flex justify-end pr-4">
+            <span className={`${isLiked ? "text-red-500" : "text-white"}`}>
               {likeCount}
-              <i
-                className={`fa-solid fa-heart cursor-pointer pl-2 ${isLiked ? "text-red-500" : "text-white"}`}
-                onClick={(e) => handlerLike(e)}
-                style={{ transition: 'color 0.3s' }}
-              ></i>
+              <i className={`fa-solid fa-heart cursor-pointer pl-2 transition-colors duration-300 ${isLiked ? "text-red-500" : "text-white"}`} onClick={handlerLike}></i>
             </span>
-          )}
-        </div>
+          </div>
+        )}
         <hr className="border-t border-gray-300 dark:border-gray-700" />
       </div>
     </div>
-  </div>
   );
-}
+};
 
 export default Tweet;
