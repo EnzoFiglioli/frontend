@@ -42,7 +42,7 @@ const InputMensaje = ({ agregarNuevoMensaje }) => {
     if (isModalOpen) {
       const fetchMemes = async () => {
         try {
-          const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=LZaPolBv7OIlskxlkHVFZz3DsfzBmZMd&q=memes&limit=5`);
+          const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=LZaPolBv7OIlskxlkHVFZz3DsfzBmZMd&q=memes&limit=70`);
           const data = await response.json();
           setMemes(data.data);
         } catch (error) {
@@ -82,7 +82,7 @@ const InputMensaje = ({ agregarNuevoMensaje }) => {
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
-
+      setMemeReq("");
       const result = await response.json();
       console.log("Respuesta de la API:", result);
 

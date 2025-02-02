@@ -52,7 +52,9 @@ const MensajesTablero = () => {
                 name: i.name,
                 lastname: i.lastname,
                 likes: i.likes,
-                likesActive: i.likeActive
+                likesActive: i.likeActive,
+                image: i.image,
+                verfication: i.verfication,
               }))
             );
           } else {
@@ -94,6 +96,8 @@ const MensajesTablero = () => {
               avatar: i.avatar.startsWith("/uploads") ? `${baseDir}${i.avatar}` : i.avatar,
               fecha: i.createdAt,
               categoria: i.categoria,
+              image: i.image,
+              verfication: i.verfication
             }))
           );
         } else {
@@ -167,6 +171,8 @@ const MensajesTablero = () => {
         count={msg.likes}
         name={msg.name}
         lastname={msg.lastname}
+        image={msg.image}
+        verfication={msg.verfication}
         />
     ) : (
       <div key={`msg-${index}`}>Contenido no disponible</div>

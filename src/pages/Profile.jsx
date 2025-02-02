@@ -7,6 +7,7 @@ import { useSession } from "../context/SessionContext.jsx";
 import { handlerDate } from "../handler/handlerDate.js";
 import Modal from "react-modal";
 import ProfileNotFound from "../components/ProfileNotFound.jsx";
+import Verification from "../components/Verification.jsx";
 
 Modal.setAppElement('#root');
 
@@ -20,11 +21,12 @@ export const Profile = () => {
         name: "",
         lastname: "",
         email: "",
-        avatar: ""
+        avatar: "",
+        verification: false,
+        bio: ""
     });
     const [loading, setLoading] = useState(true);
     const { username } = useParams();
-    const { userData, setUserData } = useSession();
     const userActive = JSON.parse(localStorage.getItem("user"));
     if (userActive == null) return window.location.href = "/"; 
 
@@ -38,6 +40,7 @@ export const Profile = () => {
         })
         .then((res) => res.json())
         .then((res) => {
+            console.log(res)
             setUsuario(res);
             setLoading(false);
         })
@@ -155,7 +158,7 @@ export const Profile = () => {
                 <img
                     src="https://i.pinimg.com/originals/65/ba/48/65ba488626025cff82f091336fbf94bb.gif"
                     alt="loader"
-                    className="w-16 h-16 opacity-80"
+                    className="w-1/4 h-1/4 opacity-80"
                 />
             </div>
         );
@@ -169,20 +172,25 @@ export const Profile = () => {
                     <title>{`${usuario.name} ${usuario.lastname} | Perfil`}</title>
                     <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css'></link>
                     <Nav />
-                    <hr className="text-gray-300" />
-                    <div className="flex flex-col justify-center items-center gap-6 py-4">
+                    <div className="flex flex-col justify-center items-center gap-6 py-4 relative">
+                    <picture className="w-full h-40 bg-cover bg-center" style={{ backgroundImage: "url(https://4kwallpapers.com/images/walls/thumbs_3t/3086.jpg)" }}></picture>
+
                         <img
                             src={usuario.avatar.startsWith("/") ? `${baseDir}${usuario.avatar}` : usuario.avatar}
                             alt={`avatar-${usuario.username.toLowerCase()}`}
-                            className="w-32 h-32 rounded-full object-cover border-2 border-blue-500"
+                            className="size-40 rounded-full object-cover border-2 border-blue-500"
                         />
+                        <div>
                         <div className="flex gap-4 items-center">
                             <div className="flex flex-col items-center p-6">
-                                <h2 className="text-3xl font-semibold text-gray-800 dark:text-white mb-2">
-                                    {usuario.name} {usuario.lastname} {usuario.username == "EnzoF1996" && <i className="fi fi-rr-badge-check"></i>}
+                                <h2 className="text-3xl font-semibold text-gray-800 dark:text-white mb-2 flex items-center">
+                                {usuario.name} {usuario.lastname} {usuario.verification ?
+                                <Verification /> : ""}
                                 </h2>
-                                <h4 className="text-xl font-medium">@{usuario.username}</h4>
+                                <h4 className="text-xl text-gray-400 font-medium">@{usuario.username}</h4>
                             </div>
+                            </div>
+                            <div className="flex justify-center items-center">    
                             {userActive.username !== usuario.username && (
                                 <button
                                     className={`px-4 py-2 rounded-full text-white font-semibold transition-all duration-300 ${siguiendo ? 'bg-blue-500' : 'bg-green-500'}`}
@@ -191,8 +199,14 @@ export const Profile = () => {
                                     {siguiendo ? "Siguiendo" : "Seguir"}
                                 </button>
                             )}
+                            </div>
                         </div>
-                        <h5 className="text-gray-600 text-md">{usuario.email}</h5>
+                        <p>{usuario.bio}</p>
+                        <h5 className="text-gray-400 text-md">Olavarria,Buenos Aires, Argentina.</h5>
+                        <ul className="flex space-x-8">
+                            <li className="text-lg font-semibold text-gray-400"><i className="text-white pr-2">{followers}</i>Seguidores</li>
+                            <li className="text-lg font-semibold text-gray-400"><i className="text-white pr-2">{following}</i>Seguidos</li>
+                        </ul>
                         {userActive.username === usuario.username && (
                             <div>
                                 <button
@@ -209,10 +223,6 @@ export const Profile = () => {
                                 </button>
                             </div>
                         )}
-                        <ul className="flex space-x-8 mt-6">
-                            <li className="text-lg font-semibold">Seguidores: <i className="text-gray-500">{followers}</i></li>
-                            <li className="text-lg font-semibold">Seguidos: <i className="text-gray-500">{following}</i></li>
-                        </ul>
                         <h3 className="text-xl font-semibold mt-6">Tweets:</h3>
                         <div className="px-5 mt-4 space-y-4 w-full max-w-3xl">
                             {tweets.length > 0 ? (
@@ -227,10 +237,12 @@ export const Profile = () => {
                                         lastname={usuario.lastname}
                                         count={i.likes}
                                         liked={i.likesActive}
+                                        verfication={i.verfication}
+                                        image={i.image}
                                     />
                                 ))
                             ) : (
-                                <h3 className="text-gray-600 text-center">Aún no tienes ningún mensaje en tu tablero</h3>
+                                <h3 className="text-gray-400 text-center">Aún no tienes ningún mensaje en tu tablero</h3>
                             )}
                         </div>
                     </div>
