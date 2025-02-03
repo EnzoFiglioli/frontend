@@ -24,7 +24,8 @@ export const Profile = () => {
         avatar: "",
         verification: false,
         bio: "",
-        image: ""
+        image: "",
+        link:""
     });
     const [loading, setLoading] = useState(true);
     const { username } = useParams();
@@ -202,6 +203,7 @@ export const Profile = () => {
                         </div>
                         <p>{usuario.bio}</p>
                         <h5 className="text-gray-400 text-md">Olavarria,Buenos Aires, Argentina.</h5>
+                        {usuario.link?<a href={usuario.link}>{usuario.link}</a> :""}
                         <ul className="flex space-x-8">
                             <li className="text-lg font-semibold text-gray-400"><i className="text-white pr-2">{followers}</i>Seguidores</li>
                             <li className="text-lg font-semibold text-gray-400"><i className="text-white pr-2">{following}</i>Seguidos</li>

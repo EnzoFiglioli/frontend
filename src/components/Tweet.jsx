@@ -4,7 +4,7 @@ import { useSession } from "../context/SessionContext.jsx";
 import { baseDir } from "../path.js";
 import Verification from "./Verification.jsx";
 
-const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count, name, lastname, image, verification }) => {
+const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count, name, lastname, image, verfication }) => {
   const [isLiked, setIsLiked] = useState(() => {
     const storedLike = sessionStorage.getItem(`liked-${id}`);
     try {
@@ -70,7 +70,7 @@ const Tweet = ({ contenido, usuario, categoria, fecha, avatar, id, liked, count,
           <div className="flex flex-col pl-4 w-full">
             <div className="flex justify-between items-center w-full">
               <h5 className="font-semibold flex items-center text-base sm:text-lg md:text-xl">
-                {name} {lastname} {verification && <Verification />} 
+                {name} {lastname} {verfication? <Verification /> : ""} 
                 <span className="ml-2 dark:text-gray-300 text-xs sm:text-sm md:text-base whitespace-nowrap">@{usuario} | {categoria} · {fecha}</span>
               </h5>
             </div>
