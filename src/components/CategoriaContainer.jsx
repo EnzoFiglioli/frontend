@@ -27,7 +27,7 @@ const CategoriaContainer = () => {
 
   return (
     <nav aria-label="Categorías">
-      <div className="my-2 border-l-4 border-gray-300 dark:border-gray-700 pl-4">
+      <div className="my-2 pl-4">
         <h2 className="text-2xl font-semibold mb-4 text-black dark:text-white">Categorías</h2>
         <ul className="space-y-2">
           {categorias.map((categoria, index) => (

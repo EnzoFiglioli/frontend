@@ -8,6 +8,7 @@ import { handlerDate } from "../handler/handlerDate.js";
 import Modal from "react-modal";
 import ProfileNotFound from "../components/ProfileNotFound.jsx";
 import Verification from "../components/Verification.jsx";
+import "../index.css"
 
 Modal.setAppElement('#root');
 
@@ -16,6 +17,8 @@ export const Profile = () => {
     const [followers, setFollowers] = useState(0);
     const [following, setFollowing] = useState(0);
     const [siguiendo, setSiguiendo] = useState(false);
+    const [municipios, setMunicipios] = useState([]);
+    const [step, setStep] = useState(1);
     const [usuario, setUsuario] = useState({
         username: "",
         name: "",
@@ -23,10 +26,12 @@ export const Profile = () => {
         email: "",
         avatar: "",
         verification: false,
-        bio: (i)=> i.replace(/\n/g, '<br>'),
+        bio: "",
         image: "",
-        link:""
+        link:"",
+        ciudades:""
     });
+
     const [loading, setLoading] = useState(true);
     const { username } = useParams();
     const userActive = JSON.parse(localStorage.getItem("user"));
@@ -34,6 +39,16 @@ export const Profile = () => {
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+    useEffect(()=>{
+        fetch("https://apis.datos.gob.ar/georef/api/municipios?max=5000")
+        .then(res => res.json())
+        .then(res => {
+            setMunicipios(res.municipios.map(m => m.nombre));
+            setMunicipios(i => i.sort())
+        })
+        .catch(err => console.error(err))
+    },[])
 
     useEffect(() => {
         fetch(`${baseDir}/api/usuarios/${username}`, {
@@ -133,13 +148,14 @@ export const Profile = () => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                id:userActive.id,
+                id: userActive.id,
                 name: usuario.name,
                 lastname: usuario.lastname,
                 email: usuario.email,
-                bio: usuario.bio,
-                link: usuario.link
-            })
+                bio: usuario.bio.replace(/\n/g, '<br>'),
+                link: usuario.link,
+                ciudad: usuario.ciudades 
+            })            
         })
         .then((res) => res.json())
         .then((res) => {
@@ -206,7 +222,7 @@ export const Profile = () => {
                             </div>
                         </div>
                         <section className="flex-col justify-center items-center md:text-center sm:text-center sm:px-4  ">
-                            <p dangerouslySetInnerHTML={{ __html: usuario.bio.replace(/\n/g, "<br>") }} />
+                            {usuario.bio ? <p dangerouslySetInnerHTML={{ __html: usuario.bio.replace(/\n/g, "<br>") }} /> : ""}
                             <h5 className="text-gray-400 text-md"><i className="fa-solid fa-location-dot mr-2"></i>Olavarria,Buenos Aires, Argentina.</h5>
                             {usuario.link?<a href={usuario.link} className="text-blue-600" target="_blank"><i className="fa-solid fa-link mr-2"></i>{usuario.link}</a> :""}
                         </section>
@@ -277,78 +293,123 @@ export const Profile = () => {
                             </button>
                         </div>
                     </Modal>
-                    <Modal
+                    <Modal 
                         isOpen={isEditModalOpen}
                         onRequestClose={() => setIsEditModalOpen(false)}
                         contentLabel="Editar perfil"
-                        className="modal dark:bg-gray-900"
+                        className="modal dark:bg-gray-800 w-screen"
                         overlayClassName="overlay"
-                    >
-                        <div>
-                        <h2 className="text-2xl dark:text-white text-black">Editar tu perfil</h2>
-                        <form className="text-black">
-                            <label htmlFor="name" className="dark:text-white text-black block mt-4">Nombre:</label>
-                            <input
-                                type="text"
-                                name="name"
-                                id="name"
-                                className="w-full p-2 border-2 border-gray-300 rounded-md"
-                                value={usuario.name}
-                                onChange={(e) => setUsuario({...usuario, name: e.target.value})}
-                            />
-                            <label htmlFor="lastname" className="dark:text-white text-black block mt-4">Apellido:</label>
-                            <input
-                                type="text"
-                                name="lastname"
-                                id="lastname"
-                                className="w-full p-2 border-2 border-gray-300 rounded-md"
-                                value={usuario.lastname}
-                                onChange={(e) => setUsuario({...usuario, lastname: e.target.value})}
-                            />
-                            <label htmlFor="email" className="dark:text-white text-black block mt-4">Correo electrónico:</label>
-                            <input
-                                type="email"
-                                name="email"
-                                id="email"
-                                className="w-full p-2 border-2 border-gray-300 rounded-md"
-                                value={usuario.email}
-                                onChange={(e) => setUsuario({...usuario, email: e.target.value})}
-                            />
-                            <label htmlFor="bio" className="dark:text-white text-black block mt-4">Biografia:</label>
-                            <textarea
-                                value={usuario.bio}
-                                id="bio"
-                                name="bio"
-                                className="w-full p-2 border-2 border-gray-300 h-6 rounded-md"
-                                onChange={(e) => setUsuario({...usuario, bio: e.target.value})}
-                                maxLength={255}
-                            ></textarea>
-                            <label htmlFor="link" className="dark:text-white text-black block mt-4">Enlace:</label>
-                            <input 
-                                type="text" 
-                                value={usuario.link}
-                                id="link"
-                                name="link"
-                                className="w-full p-2 border-2 border-gray-300 rounded-md"
-                                onChange={(e) => setUsuario({...usuario, link: e.target.value})}
-                            />
-                        </form>
-                        <div className="flex justify-between mt-4">
-                            <button
-                                onClick={() => setIsEditModalOpen(false)}
-                                className="bg-gray-300 text-black px-4 py-2 rounded-full"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleEditProfile}
-                                className="bg-yellow-500 text-white px-6 py-2 rounded-full"
-                            >
-                                Guardar cambios
-                            </button>
-                        </div>
-                        </div>
-                    </Modal>
+                        shouldCloseOnOverlayClick={true}
+                        centered
+                        >
+                            <div style={{overflow:"auto"}}>
+                                <h2 className="text-3xl font-semibold mb-6 text-center">Editar tu perfil</h2>
+                                <form className="space-y-6">
+                                    {step == 1 &&
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        <div>
+                                            <label htmlFor="name" className="text-lg">Nombre:</label>
+                                            <input
+                                                type="text"
+                                                name="name"
+                                                id="name"
+                                                className="w-full p-3 border-2 border-gray-300 rounded-md    dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                                value={usuario.name}
+                                                onChange={(e) => setUsuario({...usuario, name: e.target.value})}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="lastname" className="text-lg">Apellido:</label>
+                                            <input
+                                                type="text"
+                                                name="lastname"
+                                                id="lastname"
+                                                className="w-full p-3 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                                value={usuario.lastname}
+                                                onChange={(e) => setUsuario({...usuario, lastname: e.target.value})}
+                                            />
+                                        </div>
+                                    </div>
+                                    }
+                                    {step == 2 &&(
+                                        <>
+                                            <div>
+                                                <label htmlFor="email" className="text-lg">Correo electrónico:</label>
+                                                <input
+                                                    type="email"
+                                                    name="email"
+                                                    id="email"
+                                                    className="w-full p-3 border-2 border-gray-300 rounded-md    dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                                    value={usuario.email}
+                                                    onChange={(e) => setUsuario({...usuario, email: e.target.value})}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="bio" className="text-lg">Biografía:</label>
+                                                <textarea
+                                                    value={usuario.bio}
+                                                    id="bio"
+                                                    name="bio"
+                                                    className="w-full p-3 border-2 border-gray-300 rounded-md    dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                                    onChange={(e) => setUsuario({...usuario, bio: e.target.value})}maxLength={255}
+                                                    rows="4"
+                                                />
+                                            </div>
+                                        </>)}
+                                        {step === 3 &&
+                                            <div>
+                                                <div>
+                                                    <label htmlFor="link" className="text-lg">Enlace:</label>
+                                                    <input
+                                                        type="text"
+                                                        value={usuario.link}
+                                                        id="link"
+                                                        name="link"
+                                                        className="w-full p-3 border-2 border-gray-300 rounded-md    dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                                        onChange={(e) => setUsuario({...usuario, link: e.target.value})}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="city" className="text-lg">Ciudad:</label>
+                                                    <select
+                                                        id="city"
+                                                        name="city"
+                                                        className="w-full p-3 border-2 border-gray-300 rounded-md focus:outline-none dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                                        onChange={(e) => setUsuario({...usuario, ciudades: e.target.value})}
+                                                    >
+                                                        <option>Selecciona una ciudad</option>
+                                                        {municipios.map((i, ix) => (
+                                                            <option
+                                                                key={ix}
+                                                                value={i}
+                                                            >{i}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>}
+                                            </form>
+                                            <div className="flex justify-between mt-6">
+                                                <button
+                                                    onClick={() => {setIsEditModalOpen(false), setStep(1)}}
+                                                    className="bg-gray-300 text-black px-6 py-2 rounded-full transition-all hover:bg-gray-400"
+                                                >
+                                                    Cancelar
+                                                </button>
+                                                {step === 3 ? 
+                                                <button
+                                                    onClick={handleEditProfile}
+                                                    className="bg-yellow-500 text-white px-6 py-2 rounded-full transition-all hover:bg-yellow-600"
+                                                >
+                                                    Guardar cambios
+                                                </button> :
+                                                <button className="bg-blue-500 text-white px-6 py-2 rounded-full transition-all hover:bg-blue-600" onClick={()=> setStep(step + 1 )}>Siguiente</button>
+                                            }
+                                            </div>
+                                        </div>
+                                        </Modal>
+
+
                 </>
             ) : (
                 <ProfileNotFound />
