@@ -23,7 +23,8 @@ export const Profile = () => {
         email: "",
         avatar: "",
         verification: false,
-        bio: ""
+        bio: "",
+        image: ""
     });
     const [loading, setLoading] = useState(true);
     const { username } = useParams();
@@ -47,7 +48,6 @@ export const Profile = () => {
         .catch((err) => console.error(err));
     }, [username]);
 
-    // Obtener los tweets del perfil
     useEffect(() => {
         fetch(`${baseDir}/api/tweets/profile/${username}`, {
             method: "GET"
@@ -74,7 +74,6 @@ export const Profile = () => {
         .catch(err => console.log(err));
     }, [username]);
 
-    // Manejo del seguimiento
     const handlerFollow = (e) => {
         e.preventDefault();
         fetch(`${baseDir}/api/usuarios/follow`, {
