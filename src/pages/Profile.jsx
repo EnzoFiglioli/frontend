@@ -23,7 +23,7 @@ export const Profile = () => {
         email: "",
         avatar: "",
         verification: false,
-        bio: "",
+        bio: (i)=> i.replace(/\n/g, '<br>'),
         image: "",
         link:""
     });
@@ -136,7 +136,9 @@ export const Profile = () => {
                 id:userActive.id,
                 name: usuario.name,
                 lastname: usuario.lastname,
-                email: usuario.email
+                email: usuario.email,
+                bio: usuario.bio,
+                link: usuario.link
             })
         })
         .then((res) => res.json())
@@ -173,16 +175,18 @@ export const Profile = () => {
                     <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css'></link>
                     <Nav />
                     <div className="flex flex-col justify-center items-center gap-6 py-4 relative">
-                    <picture className="w-full h-40 bg-cover bg-center" style={{ backgroundImage: "url(https://4kwallpapers.com/images/walls/thumbs_3t/3086.jpg)" }}></picture>
-
+                    <picture className=" flex justify-center align-center relative w-full h-40 bg-cover bg-center" style={{ backgroundImage: "url(https://4kwallpapers.com/images/walls/thumbs_3t/3086.jpg)" }}>
                         <img
                             src={usuario.avatar.startsWith("/") ? `${baseDir}${usuario.avatar}` : usuario.avatar}
                             alt={`avatar-${usuario.username.toLowerCase()}`}
-                            className="size-40 rounded-full object-cover border-2 border-blue-500"
+                            className="size-40 rounded-full object-cover border-2 border-blue-500 absolute"
+                            style={{bottom:"-40px"}}
                         />
+                    </picture>
+
                         <div>
                         <div className="flex gap-4 items-center">
-                            <div className="flex flex-col items-center p-6">
+                            <div className="flex flex-col items-center p-4">
                                 <h2 className="text-3xl font-semibold text-gray-800 dark:text-white mb-2 flex items-center">
                                 {usuario.name} {usuario.lastname} {usuario.verification ?
                                 <Verification /> : ""}
@@ -201,9 +205,11 @@ export const Profile = () => {
                             )}
                             </div>
                         </div>
-                        <p>{usuario.bio}</p>
-                        <h5 className="text-gray-400 text-md">Olavarria,Buenos Aires, Argentina.</h5>
-                        {usuario.link?<a href={usuario.link}>{usuario.link}</a> :""}
+                        <section className="flex-col justify-center items-center md:text-center sm:text-center sm:px-4  ">
+                            <p dangerouslySetInnerHTML={{ __html: usuario.bio.replace(/\n/g, "<br>") }} />
+                            <h5 className="text-gray-400 text-md"><i className="fa-solid fa-location-dot mr-2"></i>Olavarria,Buenos Aires, Argentina.</h5>
+                            {usuario.link?<a href={usuario.link} className="text-blue-600" target="_blank"><i className="fa-solid fa-link mr-2"></i>{usuario.link}</a> :""}
+                        </section>
                         <ul className="flex space-x-8">
                             <li className="text-lg font-semibold text-gray-400"><i className="text-white pr-2">{followers}</i>Seguidores</li>
                             <li className="text-lg font-semibold text-gray-400"><i className="text-white pr-2">{following}</i>Seguidos</li>
@@ -278,6 +284,7 @@ export const Profile = () => {
                         className="modal dark:bg-gray-900"
                         overlayClassName="overlay"
                     >
+                        <div>
                         <h2 className="text-2xl dark:text-white text-black">Editar tu perfil</h2>
                         <form className="text-black">
                             <label htmlFor="name" className="dark:text-white text-black block mt-4">Nombre:</label>
@@ -307,6 +314,24 @@ export const Profile = () => {
                                 value={usuario.email}
                                 onChange={(e) => setUsuario({...usuario, email: e.target.value})}
                             />
+                            <label htmlFor="bio" className="dark:text-white text-black block mt-4">Biografia:</label>
+                            <textarea
+                                value={usuario.bio}
+                                id="bio"
+                                name="bio"
+                                className="w-full p-2 border-2 border-gray-300 h-6 rounded-md"
+                                onChange={(e) => setUsuario({...usuario, bio: e.target.value})}
+                                maxLength={255}
+                            ></textarea>
+                            <label htmlFor="link" className="dark:text-white text-black block mt-4">Enlace:</label>
+                            <input 
+                                type="text" 
+                                value={usuario.link}
+                                id="link"
+                                name="link"
+                                className="w-full p-2 border-2 border-gray-300 rounded-md"
+                                onChange={(e) => setUsuario({...usuario, link: e.target.value})}
+                            />
                         </form>
                         <div className="flex justify-between mt-4">
                             <button
@@ -321,6 +346,7 @@ export const Profile = () => {
                             >
                                 Guardar cambios
                             </button>
+                        </div>
                         </div>
                     </Modal>
                 </>
