@@ -3,7 +3,6 @@ import { baseDir } from "../path";
 import { useEffect, useState } from "react";
 import Tweet from "../components/Tweet.jsx";
 import { useParams } from "react-router-dom";
-import { useSession } from "../context/SessionContext.jsx";
 import { handlerDate } from "../handler/handlerDate.js";
 import Modal from "react-modal";
 import ProfileNotFound from "../components/ProfileNotFound.jsx";
@@ -29,9 +28,8 @@ export const Profile = () => {
         bio: "",
         image: "",
         link:"",
-        ciudades:""
+        ciudad:""
     });
-
     const [loading, setLoading] = useState(true);
     const { username } = useParams();
     const userActive = JSON.parse(localStorage.getItem("user"));
@@ -39,6 +37,8 @@ export const Profile = () => {
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+    console.log(usuario)
 
     useEffect(()=>{
         fetch("https://apis.datos.gob.ar/georef/api/municipios?max=5000")
@@ -141,6 +141,7 @@ export const Profile = () => {
     };
 
     const handleEditProfile = () => {
+        console.log(JSON.stringify(usuario))
         fetch(`${baseDir}/api/usuarios/editar`, {
             method: "PATCH",
             credentials: "include",
@@ -154,7 +155,7 @@ export const Profile = () => {
                 email: usuario.email,
                 bio: usuario.bio.replace(/\n/g, '<br>'),
                 link: usuario.link,
-                ciudad: usuario.ciudades 
+                ciudad: usuario.ciudad
             })            
         })
         .then((res) => res.json())
@@ -222,9 +223,9 @@ export const Profile = () => {
                             </div>
                         </div>
                         <section className="flex-col justify-center items-center md:text-center sm:text-center sm:px-4  ">
-                            {usuario.bio ? <p dangerouslySetInnerHTML={{ __html: usuario.bio.replace(/\n/g, "<br>") }} /> : ""}
-                            <h5 className="text-gray-400 text-md"><i className="fa-solid fa-location-dot mr-2"></i>Olavarria,Buenos Aires, Argentina.</h5>
+                            {usuario.bio ? <p dangerouslySetInnerHTML={{ __html: usuario.bio.replace(/\n/g, ) }} /> : ""}
                             {usuario.link?<a href={usuario.link} className="text-blue-600" target="_blank"><i className="fa-solid fa-link mr-2"></i>{usuario.link}</a> :""}
+                            <h5 className="text-gray-400 text-md"><i className="fa-solid fa-location-dot mr-2"></i>{`${usuario.ciudad}` || "Desconocido"}, Argentina.</h5>
                         </section>
                         <ul className="flex space-x-8">
                             <li className="text-lg font-semibold text-gray-400"><i className="text-white pr-2">{followers}</i>Seguidores</li>
@@ -347,11 +348,11 @@ export const Profile = () => {
                                             <div>
                                                 <label htmlFor="bio" className="text-lg">Biografía:</label>
                                                 <textarea
-                                                    value={usuario.bio}
+                                                    value={usuario.bio.replace(/<br>/g, '\n')}
                                                     id="bio"
                                                     name="bio"
                                                     className="w-full p-3 border-2 border-gray-300 rounded-md    dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-                                                    onChange={(e) => setUsuario({...usuario, bio: e.target.value})}maxLength={255}
+                                                    onChange={(e) => setUsuario({...usuario, bio: e.target.value.replace(/\n/g, '<br>')})}maxLength={255}
                                                     rows="4"
                                                 />
                                             </div>
@@ -370,22 +371,20 @@ export const Profile = () => {
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label htmlFor="city" className="text-lg">Ciudad:</label>
+                                                    <label htmlFor="ciudad" className="text-lg">Ciudad:</label>
                                                     <select
-                                                        id="city"
-                                                        name="city"
+                                                        id="ciudad"
+                                                        name="ciudad"
+                                                        value={usuario.ciudad}  // Aquí debe estar el valor actual de la ciudad
+                                                        onChange={(e) => setUsuario({...usuario, ciudad: e.target.value})}
                                                         className="w-full p-3 border-2 border-gray-300 rounded-md focus:outline-none dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-                                                        onChange={(e) => setUsuario({...usuario, ciudades: e.target.value})}
                                                     >
-                                                        <option>Selecciona una ciudad</option>
+                                                        <option value="">Selecciona una ciudad</option>
                                                         {municipios.map((i, ix) => (
-                                                            <option
-                                                                key={ix}
-                                                                value={i}
-                                                            >{i}
-                                                            </option>
+                                                            <option key={ix} value={i}>{i}</option>
                                                         ))}
                                                     </select>
+
                                                 </div>
                                             </div>}
                                             </form>

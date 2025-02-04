@@ -95,6 +95,7 @@ const LoginModal = () => {
             Regístrate aquí
           </a>.
         </p>
+        <a className="text-blue-500" href="/reset_password">¿Olvidaste tu constraseña?</a>
       </form>
     </div>
   );
