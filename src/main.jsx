@@ -7,8 +7,8 @@ import { TweetProvider } from "./context/TweetContex.jsx";
 
 import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
-import {ResetPassword} from "./pages/ResetPassword.jsx"
-import {Profile} from "./pages/Profile.jsx"
+import ResetPassword from "./pages/ResetPassword.jsx";
+import {Profile} from "./pages/Profile.jsx";
 import "./index.css";
 import App from "./App.jsx";
 

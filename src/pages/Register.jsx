@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import profile from "../data/profile.json";
 import { baseDir } from "../path.js";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Sun } from "lucide-react";
 
 const AvatarSelection = ({ onNext, setMainAvatar, mainAvatar, setFormData }) => {
   return (
@@ -43,12 +43,12 @@ const UsernameForm = ({ formData, setFormData, onNext, onBack }) => (
       name="username"
       value={formData.username}
       onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-      className="w-full px-3 py-2 border rounded-lg"
+      className="w-full px-3 py-2 border rounded-lg dark:text-black"
       required
       placeholder="Nombre de Usuario"
     />
     <div className="flex justify-between mt-4">
-      <button onClick={onBack} className="px-4 py-2 bg-gray-300 rounded-lg">Atrás</button>
+      <button onClick={onBack} className="px-4 py-2 bg-gray-300 rounded-lg dark:bg-gray-500">Atrás</button>
       <button onClick={onNext} className="px-4 py-2 bg-blue-500 text-white rounded-lg">Siguiente</button>
     </div>
   </div>
@@ -62,7 +62,7 @@ const NameAndLastName = ({ formData, setFormData, onNext, onBack }) => (
       name="name"
       value={formData.name}
       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-      className="w-full px-3 py-2 border rounded-lg"
+      className="w-full px-3 py-2 border rounded-lg dark:text-black"
       required
       placeholder="Nombre"
     />
@@ -72,11 +72,11 @@ const NameAndLastName = ({ formData, setFormData, onNext, onBack }) => (
       value={formData.lastname}
       placeholder="Apellido"
       onChange={(e) => setFormData({ ...formData, lastname: e.target.value })}
-      className="w-full px-3 py-2 border rounded-lg mt-2"
+      className="w-full px-3 py-2 border rounded-lg mt-2 dark:text-black"
       required
     />
     <div className="flex justify-between mt-4">
-      <button onClick={onBack} className="px-4 py-2 bg-gray-300 rounded-lg">Atrás</button>
+      <button onClick={onBack} className="px-4 py-2 bg-gray-300 rounded-lg dark:bg-gray-500">Atrás</button>
       <button onClick={onNext} className="px-4 py-2 bg-blue-500 text-white rounded-lg">Siguiente</button>
     </div>
   </div>
@@ -91,7 +91,7 @@ const EmailPasswordForm = ({ formData, setFormData, onSubmit, onBack }) => (
       placeholder="Correo Electrónico"
       value={formData.email}
       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-      className="w-full px-3 py-2 border rounded-lg"
+      className="w-full px-3 py-2 border rounded-lg dark:text-black"
       required
     />
     <input
@@ -99,7 +99,7 @@ const EmailPasswordForm = ({ formData, setFormData, onSubmit, onBack }) => (
       name="password"
       value={formData.password}
       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-      className="w-full px-3 py-2 border rounded-lg mt-2"
+      className="w-full px-3 py-2 border rounded-lg mt-2 dark:text-black"
       placeholder="Contraseña"
       required
     />
@@ -108,12 +108,12 @@ const EmailPasswordForm = ({ formData, setFormData, onSubmit, onBack }) => (
       name="confirmPassword"
       value={formData.confirmPassword}
       onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-      className="w-full px-3 py-2 border rounded-lg mt-2"
+      className="w-full px-3 py-2 border rounded-lg mt-2 dark:text-black"
       placeholder="Repetir Contraseña"
       required
     />
     <div className="flex justify-between mt-4">
-      <button onClick={onBack} className="px-4 py-2 bg-gray-300 rounded-lg">Atrás</button>
+      <button onClick={onBack} className="px-4 py-2 bg-gray-300 rounded-lg dark:bg-gray-500">Atrás</button>
       <button onClick={onSubmit} className="px-4 py-2 bg-green-500 text-white rounded-lg">Finalizar</button>
     </div>
   </div>
@@ -124,6 +124,7 @@ export const Register = () => {
 
   const [step, setStep] = useState(1);
   const [mainAvatar, setMainAvatar] = useState("https://cdn0.iconfinder.com/data/icons/superhero-2/256/Batman-512.png");
+  const [theme, setTheme] = useState("dark");
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -156,12 +157,37 @@ export const Register = () => {
       .catch((err) => console.log(err));
   };
 
+  useEffect(() => {
+    const storedTheme = localStorage.getItem("theme"); 
+    if (storedTheme) {
+      setTheme(storedTheme);
+      document.documentElement.classList.toggle("dark", storedTheme === "dark");
+    } else {
+      // Si no hay tema almacenado, asignamos "dark" por defecto
+      localStorage.setItem("theme", "dark");
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
+
+  // Función para alternar entre los temas y actualizar el localStorage
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Link to="/" className="absolute top-4 left-4 flex items-center text-black hover:underline">
-        <ArrowLeft size={24} className="mr-1" /> Volver
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-800">
+      <Link to="/" className="absolute top-4 left-4 flex items-center text-black dark:text-white hover:underline">
+        <ArrowLeft size={24} className="mr-1 dark:text-white" /> Volver
       </Link>
-      <div className="p-7 rounded-lg shadow-md w-full max-w-md bg-white">
+      <Sun 
+        className="absolute top-4 right-4" 
+        size={24} 
+        onClick={toggleTheme}>
+      </Sun>
+      <div className="p-7 rounded-lg shadow-md w-full max-w-md bg-white dark:bg-gray-900">
         {step === 1 && <AvatarSelection onNext={() => setStep(2)} setMainAvatar={setMainAvatar} mainAvatar={mainAvatar} setFormData={setFormData} />}
         {step === 2 && <UsernameForm formData={formData} setFormData={setFormData} onNext={() => setStep(3)} onBack={() => setStep(1)} />}
         {step === 3 && <NameAndLastName formData={formData} setFormData={setFormData} onNext={() => setStep(4)} onBack={() => setStep(2)} />}
