@@ -23,6 +23,7 @@ createRoot(document.getElementById("root")).render(
               <Route path="/dashboard" element={<Dashboard />}/>
               <Route path="/profile/:username" element={<Profile />}/>
               <Route path="/reset_password" element={<ResetPassword />} />
+              <Route path="/reset_password/:token" element={<ResetPassword />} />
             </Routes>
           </TweetProvider>
       </ModalProvider>
