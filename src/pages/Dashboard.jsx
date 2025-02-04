@@ -59,7 +59,7 @@ const Dashboard = () => {
             )}
 
             <div className="flex-grow grid grid-cols-1 md:grid-cols-4 gap-4 p-4">
-              <div className="hidden md:block md:col-span-1 border-r-2 border-gray-300 dark:border-gray-700 p-4">
+              <div className="hidden md:block md:col-span-1 border-r-1 border-gray-200 dark:border-gray-700 p-4">
                 <CategoriaContainer />
               </div>
 
@@ -67,7 +67,7 @@ const Dashboard = () => {
                 <MensajesTablero />
               </div>
 
-              <div className="hidden md:flex flex-col md:col-span-1 border-l-2 border-gray-300 dark:border-gray-700 p-4">
+              <div className="hidden md:flex flex-col md:col-span-1 border-gray-300 dark:border-gray-700 p-4">
                 <div className="mb-4">
                   <TendenciasProvider>
                     <Tendencias />
@@ -78,7 +78,6 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-
             <LoginModal />
           </div>
         </div>
